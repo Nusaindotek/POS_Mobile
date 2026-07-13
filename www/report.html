@@ -1,26 +1,15 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Laporan</title>
-  <style>
-    body { background: #0F2537; color: white; padding: 15px; font-family: sans-serif; }
-    .item { background: #1B365D; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
-  </style>
-</head>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
 <body>
-  <h1>Laporan Transaksi</h1>
-  <div id="list">Memuat...</div>
+  <div class="card"><h1>Laporan</h1></div>
+  <div id="list"></div>
   <script src="app.js"></script>
   <script>
     window.addEventListener('db-ready', async () => {
       const data = await window.getAllData('transaksi');
-      const list = document.getElementById('list');
-      list.innerHTML = data.map(d => `
-        <div class="item">
-          ${new Date(d.tanggal).toLocaleDateString()} - <b>Rp ${d.total.toLocaleString()}</b>
-        </div>
-      `).join('');
+      document.getElementById('list').innerHTML = data.map(d => 
+        `<div class="card">Total: Rp ${d.total}</div>`).join('');
     });
   </script>
 </body>
