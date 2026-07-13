@@ -2,13 +2,69 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setting</title>
-<style>body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:20px} a{color:#14B3B5}</style>
+<title>Info Toko</title>
+<style>
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-size:18px; font-weight:bold; display:flex; justify-content:space-between}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.input{width:100%; padding:12px; margin:8px 0; border:1px solid #ccc; border-radius:8px; box-sizing:border-box}
+.row{display:flex; gap:10px}
+.btn{background:#14B3B5; color:white; border:none; padding:12px 20px; border-radius:20px; font-weight:bold}
+.btn-outline{border:1px solid #14B3B5; color:#14B3B5; background:white; padding:12px 20px; border-radius:20px}
+.share{background:#E3F2FD; padding:15px; border-radius:12px; display:flex; align-items:center; gap:10px}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+.bottom-nav a.active{color:#14B3B5; font-weight:bold}
+</style>
 </head>
 <body>
-  <h2>Setting</h2>
-  <p>Nama Toko: NusaPOS</p>
-  <p>Fitur setting lengkap menyusul v1.1</p>
-  <a href="index.html">← Kembali ke Menu</a>
+  <div class="header">Info Toko <span>⚙️ 🗂️</span></div>
+  
+  <div class="card">
+    <div style="display:flex; gap:15px; align-items:center">
+      <div style="background:#F5F7FA; padding:20px; border-radius:8px">🏪</div>
+      <div>
+        <b id="nama-toko">Nama Toko belum diatur</b>
+        <p id="alamat-toko">Alamat belum diatur</p>
+        <button class="btn-outline" onclick="alert('Fitur pilih logo')">Pilih Logo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>Pengaturan Informasi Toko</b>
+    <input class="input" id="nama" placeholder="🏪 Nama Toko">
+    <input class="input" id="alamat" placeholder="📍 Alamat">
+    <input class="input" id="hp" placeholder="📞 Nomor HP">
+    <div class="row">
+      <input class="input" value="10" placeholder="% Pajak">
+      <select class="input"><option>58 mm</option></select>
+    </div>
+    <input class="input" placeholder="🧾 Footer Struk (opsional)">
+    <div class="row">
+      <button class="btn" onclick="simpan()">Simpan Info Toko</button>
+      <button class="btn-outline">Backup & Restore</button>
+    </div>
+  </div>
+
+  <div class="card share">
+    <div style="background:#14B3B5; padding:10px; border-radius:8px; color:white">📤</div>
+    <div><b>Bagikan Aplikasi</b><br><small>Rekomendasikan ke teman & keluarga</small></div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="dashboard.html">🏠<br>Dashboard</a>
+    <a href="catalog.html">🧾<br>Kasir</a>
+    <a href="report.html">📊<br>Laporan</a>
+    <a href="setting.html" class="active">🏪<br>Info Toko</a>
+  </div>
+  <script>
+    function simpan(){
+      localStorage.setItem('namaToko', document.getElementById('nama').value);
+      localStorage.setItem('alamatToko', document.getElementById('alamat').value);
+      alert('Tersimpan');
+      document.getElementById('nama-toko').innerText = document.getElementById('nama').value || 'Nama Toko belum diatur';
+    }
+  </script>
 </body>
 </html>
