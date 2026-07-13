@@ -4,37 +4,44 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mesin Kasir</title>
 <style>
-body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 80px 0}
-.header{background:#14B3B5; color:#0F2537; padding:16px; font-weight:bold; display:flex; justify-content:space-between}
-.produk-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:15px}
-.produk-card{background:#1a2e3d; padding:12px; border-radius:12px; text-align:center; border:1px solid #2a3e4d}
-.produk-card button{background:#14B3B5; color:#0F2537; border:none; padding:8px; border-radius:8px; width:100%; font-weight:bold}
-.keranjang{position:fixed; bottom:60px; left:0; width:100%; background:#0a141c; padding:15px; border-top:1px solid #2a3e4d}
-.btn-simpan{background:#14B3B5; color:#0F2537; width:100%; padding:14px; border-radius:12px; border:none; font-weight:bold}
-.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0}
-.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 140px 0}
+.header{background:#14B3B5; color:#0F2537; padding:14px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between}
+.produk-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:12px}
+.produk-card{background:#1a2e3d; padding:10px; border-radius:10px; text-align:center; border:1px solid #2a3e4d}
+.produk-card button{background:#14B3B5; color:#0F2537; border:none; padding:6px; border-radius:6px; width:100%; font-weight:bold; font-size:13px}
+.keranjang{position:fixed; bottom:50px; left:0; width:100%; background:#0a141c; padding:10px 12px; border-top:1px solid #2a3e4d; box-sizing:border-box}
+.keranjang-item{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin:6px 0}
+.qty-btn{background:#2a3e4d; color:white; border:none; width:24px; height:24px; border-radius:6px; font-weight:bold}
+.btn-simpan{background:#14B3B5; color:#0F2537; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; font-size:15px; margin-top:8px}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
 .bottom-nav a.active{color:#14B3B5}
+.bottom-nav a div{font-size:18px; margin-bottom:2px}
 </style>
 </head>
 <body>
-  <div class="header">Mesin Kasir <a href="dashboard.html" style="color:#0F2537">←</a></div>
+  <div class="header">Mesin Kasir <a href="dashboard.html" style="color:#0F2537; text-decoration:none">←</a></div>
   <div id="produk-list" class="produk-grid"></div>
+  
   <div class="keranjang">
-    <div style="display:flex; justify-content:space-between"><b>Keranjang</b><b id="total">Rp 0</b></div>
-    <div id="list-keranjang"><small>Belum ada barang</small></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+      <b>Keranjang</b><b id="total" style="color:#14B3B5">Rp 0</b>
+    </div>
+    <div id="list-keranjang"><small style="color:#888">Belum ada barang</small></div>
     <button onclick="simpanTransaksi()" class="btn-simpan">SIMPAN TRANSAKSI</button>
   </div>
+
   <div class="bottom-nav">
-    <a href="dashboard.html">🏠<br>Dashboard</a>
-    <a href="catalog.html" class="active">🧾<br>Kasir</a>
-    <a href="report.html">📊<br>Laporan</a>
-    <a href="setting.html">🏪<br>Info Toko</a>
+    <a href="dashboard.html"><div>🏠</div>Dashboard</a>
+    <a href="catalog.html" class="active"><div>🧾</div>Kasir</a>
+    <a href="report.html"><div>📊</div>Laporan</a>
+    <a href="setting.html"><div>🏪</div>Info Toko</a>
   </div>
+
   <script>
     let keranjang=[];
     const produk=JSON.parse(localStorage.getItem('produk')) || [
-      {id:1,nama:"Nasi Goreng",harga:15000},{id:2,nama:"Es Teh",harga:4000},
-      {id:3,nama:"Ayam Bakar",harga:20000},{id:4,nama:"Aqua",harga:3000},
+      {id:1,nama:"yupi",harga:19000},{id:2,nama:"donat",harga:25000},
     ];
     document.addEventListener("DOMContentLoaded",()=>{
       const list=document.getElementById('produk-list');
@@ -42,9 +49,43 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 8
         list.innerHTML+=`<div class="produk-card"><b>${p.nama}</b><br><span style="color:#14B3B5">Rp ${p.harga.toLocaleString('id-ID')}</span><button onclick="tambah(${p.id})">+ Tambah</button></div>`
       })
     })
-    function tambah(id){const item=produk.find(p=>p.id===id);const ada=keranjang.find(k=>k.id===id);if(ada)ada.qty++;else keranjang.push({...item,qty:1});render()}
-    function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div style="font-size:13px">${i.nama} x${i.qty} - Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`;if(keranjang.length===0)list.innerHTML=`<small>Belum ada barang</small>`}
-    function simpanTransaksi(){if(keranjang.length===0)return alert("Keranjang kosong");const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);keranjang=[];render()}
+    function tambah(id){
+      const item=produk.find(p=>p.id===id);
+      const ada=keranjang.find(k=>k.id===id);
+      if(ada) ada.qty++; else keranjang.push({...item,qty:1});
+      render()
+    }
+    function kurang(id){
+      const ada=keranjang.find(k=>k.id===id);
+      if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);
+      render()
+    }
+    function render(){
+      let total=0;
+      const list=document.getElementById('list-keranjang');
+      list.innerHTML='';
+      if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}
+      keranjang.forEach(i=>{
+        total+=i.harga*i.qty;
+        list.innerHTML+=`<div class="keranjang-item">
+          <span>${i.nama}</span>
+          <div>
+            <button class="qty-btn" onclick="kurang(${i.id})">-</button>
+            <span style="margin:0 8px">${i.qty}</span>
+            <button class="qty-btn" onclick="tambah(${i.id})">+</button>
+            <span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span>
+          </div>
+        </div>`
+      });
+      document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`
+    }
+    function simpanTransaksi(){
+      if(keranjang.length===0)return alert("Keranjang kosong");
+      const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
+      localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
+      alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
+      keranjang=[];render()
+    }
   </script>
 </body>
 </html>
