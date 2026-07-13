@@ -1,12 +1,26 @@
-/* style.css */
-body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; margin: 0; padding-bottom: 80px; color: #334155; }
+/* style.css - Palette dari Icon Brand */
+:root {
+    --primary-dark: #162d46;
+    --primary-cyan: #23b4b4;
+    --bg-light: #f4f7f6;
+}
+
+body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); margin: 0; padding-bottom: 70px; color: #333; }
 .container { padding: 15px; }
-.card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-button { width: 100%; padding: 12px; background: #0ea5e9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-button:active { transform: scale(0.98); }
-h2 { color: #1e293b; margin-top: 0; }
+
+/* Tampilan Card Modern */
+.card { background: #ffffff; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 5px solid var(--primary-dark); }
+
+/* Input & Button dengan warna brand */
+input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+button { width: 100%; padding: 14px; background: var(--primary-cyan); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+button:hover { background: #1a9999; }
+button:active { transform: scale(0.97); }
 
 /* Navigasi Bawah */
-nav { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background: white; padding: 10px 0; border-top: 1px solid #e2e8f0; }
-.nav-item { text-decoration: none; color: #64748b; font-size: 12px; display: flex; flex-direction: column; align-items: center; }
+nav { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background: white; padding: 10px 0; border-top: 2px solid var(--primary-cyan); z-index: 1000; }
+.nav-item { text-decoration: none; color: var(--primary-dark); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.nav-item.active { color: var(--primary-cyan); font-weight: bold; }
+
+/* Judul */
+h2 { color: var(--primary-dark); }
