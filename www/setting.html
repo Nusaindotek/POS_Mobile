@@ -2,91 +2,23 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NusaPOS Mobile - Settings</title>
+  <title>Settings</title>
   <style>
-    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 80px; }
-    .header { padding: 15px; border-bottom: 1px solid #2a3e4d; }
-    .card { background: #1a2e3d; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #2a3e4d; }
-    .card-red { background: #3d1a1a; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #5d2a2a; }
-    .btn-tosca { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; }
-    .btn-red { background: #E63946; color: white; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; }
-    .title { color: #aaa; font-size: 12px; font-weight: bold; margin-bottom: 10px; letter-spacing:1px }
-    .title-red { color: #ff8a8a; font-size: 12px; font-weight: bold; margin-bottom: 10px; letter-spacing:1px }
-    .desc { color: #aaa; font-size: 11px; margin-top: 8px; }
-    .desc-red { color: #ff8a8a; font-size: 11px; margin-top: 8px; }
-    .footer { position: fixed; bottom: 0; width: 100%; background: #0a141c; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #2a3e4d; }
-    .footer a { color: #888; text-decoration: none; text-align: center; font-size: 12px; }
-    .footer .active { color: #14B3B5; }
+    body { background: #0F2537; color: white; font-family: sans-serif; padding: 20px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; background: #1B365D; color: white; border: none; border-radius: 5px; }
+    button { background: #00B5B5; width: 100%; padding: 10px; border: none; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
-
-  <div class="header">
-    <h1 style="font-size:16px; margin:0;">Settings</h1>
-  </div>
-
-  <div class="card">
-    <div class="title">BACKUP & DATA</div>
-    <button onclick="backupRekKoran(new Date().getMonth()+1, new Date().getFullYear())" class="btn-tosca">
-      Backup Bulan Ini Manual
-    </button>
-    <p class="desc">Auto backup akan jalan tiap tgl 1 jam 00:01</p>
-  </div>
-
-  <div class="card-red">
-    <div class="title-red">ZONA BAHAYA</div>
-    <button onclick="hapusSemuaData()" class="btn-red">
-      HAPUS SEMUA DATA TRANSAKSI
-    </button>
-    <p class="desc-red">Data transaksi akan dihapus permanen. Grafik & Omset jadi 0</p>
-  </div>
-
-  <div class="footer">
-    <a href="dashboard.html">📊<br>Dashboard</a>
-    <a href="setting.html" class="active">⚙️<br>Settings</a>
-  </div>
-
+  <h2>Pengaturan Toko</h2>
+  <input id="toko" placeholder="Nama Toko">
+  <input id="wa" placeholder="Nomor WA">
+  <button onclick="save()">SIMPAN</button>
   <script>
-    let db;
-    document.addEventListener("DOMContentLoaded", () => {
-      const request = indexedDB.open("NUSAPOS_DB", 1);
-      request.onsuccess = (e) => { db = e.target.result; };
-    });
-
-    async function getAllData(storeName) {
-        return new Promise((resolve) => {
-            db.transaction(storeName, "readonly").objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
-        });
-    }
-
-    async function backupRekKoran(bulan, tahun) {
-        const transaksi = await getAllData('transaksi');
-        const dataBulanIni = transaksi.filter(t => {
-            const tgl = new Date(t.tanggal);
-            return tgl.getMonth() + 1 == bulan && tgl.getFullYear() == tahun;
-        });
-        const dataBackup = { nama_toko: "NUSAPOS", periode: `${bulan}-${tahun}`, data_transaksi: dataBulanIni };
-        const namaFile = `RekKoran_NUSAPOS_${bulan}-${tahun}.json`;
-        const blob = new Blob([JSON.stringify(dataBackup, null, 2)], {type: "application/json"});
-        try {
-            const handle = await window.showSaveFilePicker({ suggestedName: namaFile });
-            const writable = await handle.createWritable();
-            await writable.write(blob);
-            await writable.close();
-            alert(`Backup ${namaFile} Berhasil!`);
-        } catch(err) { alert("Backup dibatalkan"); }
-    }
-
-    function hapusSemuaData() {
-        if(confirm("Yakin mau hapus SEMUA data transaksi? Tindakan ini tidak bisa dibatalkan!")) {
-            const tx = db.transaction('transaksi', 'readwrite');
-            tx.objectStore('transaksi').clear();
-            tx.oncomplete = () => {
-                alert("Semua data berhasil dihapus!");
-                window.location.href = 'dashboard.html';
-            }
-        }
+    function save() {
+      const data = { nama: document.getElementById('toko').value, wa: document.getElementById('wa').value };
+      localStorage.setItem('nusa_settings', JSON.stringify(data));
+      alert("Tersimpan!");
     }
   </script>
 </body>
