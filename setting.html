@@ -5,66 +5,100 @@
 <title>Info Toko</title>
 <style>
 body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
-.header{background:#14B3B5; color:white; padding:16px; font-size:18px; font-weight:bold; display:flex; justify-content:space-between}
-.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05)}
-.input{width:100%; padding:12px; margin:8px 0; border:1px solid #ccc; border-radius:8px; box-sizing:border-box}
-.row{display:flex; gap:10px}
-.btn{background:#14B3B5; color:white; border:none; padding:12px 20px; border-radius:20px; font-weight:bold}
-.btn-outline{border:1px solid #14B3B5; color:#14B3B5; background:white; padding:12px 20px; border-radius:20px}
-.share{background:#E3F2FD; padding:15px; border-radius:12px; display:flex; align-items:center; gap:10px}
+.header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between; align-items:center}
+.header a{color:white; text-decoration:none}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.toko-header{display:flex; align-items:center; gap:16px}
+.toko-logo{width:70px; height:70px; border-radius:12px; background:#F5F7FA; display:flex; align-items:center; justify-content:center; font-size:30px}
+.btn-logo{background:transparent; color:#14B3B5; border:2px solid #14B3B5; padding:10px 20px; border-radius:25px; font-weight:bold}
+.input{width:100%; padding:14px; margin:8px 0; border:1px solid #ddd; border-radius:10px; box-sizing:border-box; font-size:15px}
+.btn-simpan{background:#14B3B5; color:white; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px}
+.kontak-wa{display:flex; align-items:center; gap:12px; background:#E8F8F9; padding:16px; border-radius:12px; text-decoration:none; color:#333}
+.kontak-wa b{color:#14B3B5}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
-.bottom-nav a.active{color:#14B3B5; font-weight:bold}
+.bottom-nav a.active{color:#14B3B5}
 </style>
 </head>
 <body>
-  <div class="header">Info Toko <span>⚙️ 🗂️</span></div>
-  
+  <div class="header">
+    Info Toko
+    <div>
+      <a href="#" style="margin-right:15px">⚙️</a> <!-- gerigi link kosong -->
+      <a href="#">📁</a> <!-- folder link kosong -->
+    </div>
+  </div>
+
   <div class="card">
-    <div style="display:flex; gap:15px; align-items:center">
-      <div style="background:#F5F7FA; padding:20px; border-radius:8px">🏪</div>
+    <div class="toko-header">
+      <div class="toko-logo">🏪</div>
       <div>
-        <b id="nama-toko">Nama Toko belum diatur</b>
-        <p id="alamat-toko">Alamat belum diatur</p>
-        <button class="btn-outline" onclick="alert('Fitur pilih logo')">Pilih Logo</button>
+        <b id="nama-toko-view">Nama Toko belum diatur</b><br>
+        <span id="alamat-view" style="color:#888">Alamat belum diatur</span><br>
+        <button class="btn-logo" onclick="alert('Fitur pilih logo coming soon')">Pilih Logo</button>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <b>Pengaturan Informasi Toko</b>
-    <input class="input" id="nama" placeholder="🏪 Nama Toko">
-    <input class="input" id="alamat" placeholder="📍 Alamat">
-    <input class="input" id="hp" placeholder="📞 Nomor HP">
-    <div class="row">
-      <input class="input" value="10" placeholder="% Pajak">
-      <select class="input"><option>58 mm</option></select>
+    <b>Pengaturan Informasi Toko</b><br><br>
+    <input class="input" id="namaToko" placeholder="🏪 Nama Toko">
+    <input class="input" id="alamatToko" placeholder="📍 Alamat">
+    <input class="input" id="noHp" placeholder="📞 Nomor HP">
+    <div style="display:flex; gap:8px">
+      <input class="input" id="pajak" type="number" value="10" placeholder="Pajak %">
+      <select class="input" id="ukuranKertas">
+        <option>58 mm</option>
+        <option>80 mm</option>
+      </select>
     </div>
-    <input class="input" placeholder="🧾 Footer Struk (opsional)">
-    <div class="row">
-      <button class="btn" onclick="simpan()">Simpan Info Toko</button>
-      <button class="btn-outline">Backup & Restore</button>
-    </div>
+    <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
+    
+    <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
+    <!-- TOMBOL BACKUP & RESTORE UDAH DIHAPUS -->
   </div>
 
-  <div class="card share">
-    <div style="background:#14B3B5; padding:10px; border-radius:8px; color:white">📤</div>
-    <div><b>Bagikan Aplikasi</b><br><small>Rekomendasikan ke teman & keluarga</small></div>
+  <div class="card">
+    <a href="https://wa.me/6285797831868" target="_blank" class="kontak-wa">
+      <div style="font-size:35px">💬</div>
+      <div>
+        <b>Butuh Bantuan?</b><br>
+        <small>Hubungi Admin via WhatsApp</small>
+      </div>
+    </a>
   </div>
 
   <div class="bottom-nav">
-    <a href="dashboard.html">🏠<br>Dashboard</a>
-    <a href="catalog.html">🧾<br>Kasir</a>
-    <a href="report.html">📊<br>Laporan</a>
-    <a href="setting.html" class="active">🏪<br>Info Toko</a>
+    <a href="dashboard.html"><div>🏠</div>Dashboard</a>
+    <a href="catalog.html"><div>🧾</div>Kasir</a>
+    <a href="report.html"><div>📊</div>Laporan</a>
+    <a href="setting.html" class="active"><div>🏪</div>Info Toko</a>
   </div>
-  <script>
-    function simpan(){
-      localStorage.setItem('namaToko', document.getElementById('nama').value);
-      localStorage.setItem('alamatToko', document.getElementById('alamat').value);
-      alert('Tersimpan');
-      document.getElementById('nama-toko').innerText = document.getElementById('nama').value || 'Nama Toko belum diatur';
-    }
-  </script>
+
+<script>
+// Load data saat buka
+document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
+document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
+document.getElementById('noHp').value = localStorage.getItem('noHp') || '';
+document.getElementById('pajak').value = localStorage.getItem('pajak') || '10';
+document.getElementById('ukuranKertas').value = localStorage.getItem('ukuranKertas') || '58 mm';
+document.getElementById('footer').value = localStorage.getItem('footer') || '';
+
+document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
+document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
+
+function simpanInfo(){
+  localStorage.setItem('namaToko', document.getElementById('namaToko').value);
+  localStorage.setItem('alamatToko', document.getElementById('alamatToko').value);
+  localStorage.setItem('noHp', document.getElementById('noHp').value);
+  localStorage.setItem('pajak', document.getElementById('pajak').value);
+  localStorage.setItem('ukuranKertas', document.getElementById('ukuranKertas').value);
+  localStorage.setItem('footer', document.getElementById('footer').value);
+  
+  document.getElementById('nama-toko-view').innerText = document.getElementById('namaToko').value;
+  document.getElementById('alamat-view').innerText = document.getElementById('alamatToko').value;
+  alert('Info Toko Tersimpan!');
+}
+</script>
 </body>
 </html>
