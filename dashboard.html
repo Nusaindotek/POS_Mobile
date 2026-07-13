@@ -5,17 +5,21 @@
 <title>Dashboard</title>
 <style>
 body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 70px 0}
-.header{display:flex; align-items:center; padding:16px; gap:12px}
-.header img{width:50px; height:50px; border-radius:10px}
+.header{display:flex; align-items:center; justify-content:space-between; padding:16px;}
+.header-left{display:flex; align-items:center; gap:12px}
+.header img{width:45px; height:45px; border-radius:10px}
 .header b{font-size:18px}
 .header small{color:#14B3B5}
+.waktu{color:#14B3B5; font-weight:bold}
 .card{background:#1a2e3d; margin:12px; padding:16px; border-radius:12px}
 .card-flex{display:flex; justify-content:space-between}
 .tosca{color:#14B3B5; font-size:24px; font-weight:bold}
+.card-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.badge-live{background:rgba(20,179,181,0.2); color:#14B3B5; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:bold}
 .menu-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:0 12px}
 .menu-card{background:#1a2e3d; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:white}
 .badge{background:green; padding:4px 10px; border-radius:20px; font-size:11px}
-canvas{background:#1a2e3d; border-radius:12px; margin:12px; width:calc(100% - 24px) !important; height:200px !important}
+canvas{background:transparent; width:100% !important; height:220px !important}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #2a3e4d}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
 .bottom-nav a.active{color:#14B3B5}
@@ -23,32 +27,38 @@ canvas{background:#1a2e3d; border-radius:12px; margin:12px; width:calc(100% - 24
 </head>
 <body>
   <div class="header">
-    <img src="https://via.placeholder.com/50/14B3B5/0F2537?text=N">
-    <div>
-      <b>NusaPOS Owner</b><br>
-      <small>Status: Premium Beta</small>
+    <div class="header-left">
+      <img src="https://via.placeholder.com/45/14B3B5/0F2537?text=N">
+      <div>
+        <b>NusaPOS Owner</b><br>
+        <small>Status: Premium Beta</small>
+      </div>
     </div>
+    <div class="waktu" id="jam">15.02</div>
   </div>
 
   <div class="card">
     <div class="card-flex">
       <div>
-        <div>OMSET HARI INI</div>
+        <div style="color:#888; font-size:13px">OMSET HARI INI</div>
         <div class="tosca" id="omset-hari-ini">Rp 0</div>
       </div>
       <div style="text-align:right">
-        <div>TRANSAKSI</div>
+        <div style="color:#888; font-size:13px">TRANSAKSI</div>
         <div style="font-size:24px; font-weight:bold" id="transaksi-hari-ini">0</div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <b>STATISTIK JUALAN (7 HARI TERAKHIR)</b>
+    <div class="card-header">
+      <b>STATISTIK JUALAN (7 HARI TERAKHIR)</b>
+      <span class="badge-live">Grafik Live</span>
+    </div>
     <canvas id="grafik"></canvas>
   </div>
 
-  <div style="padding:0 12px; margin:12px 0">AKSES HALAMAN TOKO</div>
+  <div style="padding:0 12px; margin:12px 0; color:#888">AKSES HALAMAN TOKO</div>
   <div class="menu-grid">
     <a href="catalog.html" class="menu-card">🛒<br><b>Mesin Kasir</b><br><span class="badge">Aktif</span></a>
     <a href="katalog.html" class="menu-card">📦<br><b>Katalog Barang</b><br><span class="badge">Aktif</span></a>
@@ -61,6 +71,11 @@ canvas{background:#1a2e3d; border-radius:12px; margin:12px; width:calc(100% - 24
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Update jam real time
+setInterval(()=>{
+  document.getElementById('jam').innerText = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+}, 1000)
+
 const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
 const hariIni = new Date().toLocaleDateString('id-ID');
 
@@ -70,14 +85,14 @@ const omsetHariIni = transaksiHariIni.reduce((sum, t) => sum + t.total, 0);
 document.getElementById('omset-hari-ini').innerText = `Rp ${omsetHariIni.toLocaleString('id-ID')}`;
 document.getElementById('transaksi-hari-ini').innerText = transaksiHariIni.length;
 
-// 2. BUAT DATA 7 HARI TERAKHIR UNTUK GRAFIK
+// 2. BUAT DATA 7 HARI TERAKHIR UNTUK GRAFIK BATANG
 const labels = [];
 const dataOmset = [];
 for(let i=6; i>=0; i--){
   const d = new Date();
   d.setDate(d.getDate() - i);
   const tgl = d.toLocaleDateString('id-ID');
-  labels.push(d.toLocaleDateString('id-ID', {weekday: 'short'})); // Sen, Sel, Rab
+  labels.push(d.toLocaleDateString('id-ID', {weekday: 'short'})); // Sen, Sel
   
   const omset = riwayat
     .filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === tgl)
@@ -85,34 +100,39 @@ for(let i=6; i>=0; i--){
   dataOmset.push(omset);
 }
 
-// 3. GAMBAR GRAFIK PAKAI CHART.JS
+// 3. GAMBAR GRAFIK BATANG
 const ctx = document.getElementById('grafik');
-if(riwayat.length > 0){
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Omset',
-        data: dataOmset,
-        borderColor: '#14B3B5',
-        backgroundColor: 'rgba(20, 179, 181, 0.2)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      plugins: {legend: {display: false}},
-      scales: {
-        y: {ticks: {color: '#888'}, grid: {color: '#2a3e4d'}},
-        x: {ticks: {color: '#888'}, grid: {color: '#2a3e4d'}}
+new Chart(ctx, {
+  type: 'bar', // GANTI JADI BAR
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Omset',
+      data: dataOmset,
+      backgroundColor: '#14B3B5', // warna tosca
+      borderRadius: 8,
+      barThickness: 25
+    }]
+  },
+  options: {
+    plugins: {legend: {display: false}},
+    scales: {
+      y: {
+        ticks: {
+          color: '#888',
+          callback: function(value) { return 'Rp ' + (value/1000) + 'k' } // jadi Rp 100k
+        }, 
+        grid: {color: 'rgba(255,255,255,0.1)'}
+      },
+      x: {
+        ticks: {color: '#888'}, 
+        grid: {display: false}
       }
-    }
-  })
-} else {
-  ctx.style.display = 'none';
-  document.querySelector('.card b').insertAdjacentHTML('afterend', '<p style="color:#888">Grafik akan muncul setelah ada transaksi</p>')
-}
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+})
 </script>
 </body>
 </html>
