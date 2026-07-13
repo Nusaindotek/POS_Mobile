@@ -1,16 +1,49 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - NusaPOS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <div class="card"><h1>Laporan</h1></div>
-  <div id="list"></div>
-  <script src="app.js"></script>
-  <script>
-    window.addEventListener('db-ready', async () => {
-      const data = await window.getAllData('transaksi');
-      document.getElementById('list').innerHTML = data.map(d => 
-        `<div class="card">Total: Rp ${d.total}</div>`).join('');
-    });
-  </script>
+
+    <div class="container">
+        <h2>Laporan Transaksi</h2>
+        <div id="listTransaksi"></div>
+        <button onclick="hapusSemuaData()" style="background: #dc3545; margin-top: 20px;">Hapus Semua Data</button>
+    </div>
+
+    <nav>
+        <a href="index.html" class="nav-item">Dashboard</a>
+        <a href="catalog.html" class="nav-item">Katalog</a>
+        <a href="setting.html" class="nav-item">Setting</a>
+    </nav>
+
+    <script src="app.js"></script>
+    <script>
+        window.onload = () => {
+            const transaksi = ambilDariLocalStorage('transaksi') || [];
+            const listDiv = document.getElementById('listTransaksi');
+            
+            if(transaksi.length === 0) {
+                listDiv.innerHTML = '<p>Belum ada transaksi.</p>';
+            } else {
+                listDiv.innerHTML = transaksi.map(t => `
+                    <div class="card">
+                        <small>${t.tanggal}</small>
+                        <p>Total: <strong>Rp ${t.total}</strong></p>
+                    </div>
+                `).join('');
+            }
+        };
+
+        function hapusSemuaData() {
+            if(confirm("Yakin ingin menghapus semua transaksi?")) {
+                localStorage.removeItem('transaksi');
+                location.reload();
+            }
+        }
+    </script>
 </body>
 </html>
