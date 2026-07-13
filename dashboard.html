@@ -4,57 +4,115 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
 <style>
-body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 80px 0}
-.header{padding:15px; display:flex; align-items:center; gap:10px}
-.header img{width:40px; height:40px; border-radius:8px; background:white; object-fit:contain}
-.tosca{color:#14B3B5}
+body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 70px 0}
+.header{display:flex; align-items:center; padding:16px; gap:12px}
+.header img{width:50px; height:50px; border-radius:10px}
+.header b{font-size:18px}
+.header small{color:#14B3B5}
 .card{background:#1a2e3d; margin:12px; padding:16px; border-radius:12px}
-.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.btn-akses{background:#1a2e3d; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:white; border:1px solid #2a3e4d}
-.badge{background:green; padding:4px 8px; border-radius:20px; font-size:11px}
-.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0}
+.card-flex{display:flex; justify-content:space-between}
+.tosca{color:#14B3B5; font-size:24px; font-weight:bold}
+.menu-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:0 12px}
+.menu-card{background:#1a2e3d; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:white}
+.badge{background:green; padding:4px 10px; border-radius:20px; font-size:11px}
+canvas{background:#1a2e3d; border-radius:12px; margin:12px; width:calc(100% - 24px) !important; height:200px !important}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #2a3e4d}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
-.bottom-nav a.active{color:#14B3B5; font-weight:bold}
+.bottom-nav a.active{color:#14B3B5}
 </style>
 </head>
 <body>
   <div class="header">
-    <img src="logo.png" alt="logo">
+    <img src="https://via.placeholder.com/50/14B3B5/0F2537?text=N">
     <div>
-      <div style="font-weight:bold">NusaPOS Owner</div>
-      <div class="tosca" style="font-size:12px">Status: Premium Beta</div>
+      <b>NusaPOS Owner</b><br>
+      <small>Status: Premium Beta</small>
     </div>
   </div>
 
   <div class="card">
-    <div style="display:flex; justify-content:space-between">
-      <div><small>OMSET HARI INI</small><h2 class="tosca" id="omset">Rp 0</h2></div>
-      <div><small>TRANSAKSI</small><h2 id="transaksi">0</h2></div>
+    <div class="card-flex">
+      <div>
+        <div>OMSET HARI INI</div>
+        <div class="tosca" id="omset-hari-ini">Rp 0</div>
+      </div>
+      <div style="text-align:right">
+        <div>TRANSAKSI</div>
+        <div style="font-size:24px; font-weight:bold" id="transaksi-hari-ini">0</div>
+      </div>
     </div>
   </div>
 
   <div class="card">
-    <h3>STATISTIK JUALAN (7 HARI TERAKHIR)</h3>
-    <p style="color:#888">Grafik akan muncul setelah ada transaksi</p>
+    <b>STATISTIK JUALAN (7 HARI TERAKHIR)</b>
+    <canvas id="grafik"></canvas>
   </div>
 
-  <div style="padding:0 12px"><small>AKSES HALAMAN TOKO</small></div>
-  <div class="grid2" style="padding:12px">
-    <a href="catalog.html" class="btn-akses">🛒<br><b>Mesin Kasir</b><br><span class="badge">Aktif</span></a>
-    <a href="katalog.html" class="btn-akses">📦<br><b>Katalog Barang</b><br><span class="badge">Aktif</span></a>
+  <div style="padding:0 12px; margin:12px 0">AKSES HALAMAN TOKO</div>
+  <div class="menu-grid">
+    <a href="catalog.html" class="menu-card">🛒<br><b>Mesin Kasir</b><br><span class="badge">Aktif</span></a>
+    <a href="katalog.html" class="menu-card">📦<br><b>Katalog Barang</b><br><span class="badge">Aktif</span></a>
   </div>
 
   <div class="bottom-nav">
-    <a href="dashboard.html" class="active">📊<br>DASHBOARD</a>
-    <a href="setting.html">⚙️<br>SETTINGS</a>
+    <a href="dashboard.html" class="active"><div>📊</div>DASHBOARD</a>
+    <a href="setting.html"><div>⚙️</div>SETTINGS</a>
   </div>
-  <script>
-    const last = localStorage.getItem('lastTransaksi');
-    if(last){
-      const data = JSON.parse(last);
-      document.getElementById('omset').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
-      document.getElementById('transaksi').innerText = `1`;
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
+const hariIni = new Date().toLocaleDateString('id-ID');
+
+// 1. HITUNG OMSET & TRANSAKSI HARI INI
+const transaksiHariIni = riwayat.filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === hariIni);
+const omsetHariIni = transaksiHariIni.reduce((sum, t) => sum + t.total, 0);
+document.getElementById('omset-hari-ini').innerText = `Rp ${omsetHariIni.toLocaleString('id-ID')}`;
+document.getElementById('transaksi-hari-ini').innerText = transaksiHariIni.length;
+
+// 2. BUAT DATA 7 HARI TERAKHIR UNTUK GRAFIK
+const labels = [];
+const dataOmset = [];
+for(let i=6; i>=0; i--){
+  const d = new Date();
+  d.setDate(d.getDate() - i);
+  const tgl = d.toLocaleDateString('id-ID');
+  labels.push(d.toLocaleDateString('id-ID', {weekday: 'short'})); // Sen, Sel, Rab
+  
+  const omset = riwayat
+    .filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === tgl)
+    .reduce((sum, t) => sum + t.total, 0);
+  dataOmset.push(omset);
+}
+
+// 3. GAMBAR GRAFIK PAKAI CHART.JS
+const ctx = document.getElementById('grafik');
+if(riwayat.length > 0){
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Omset',
+        data: dataOmset,
+        borderColor: '#14B3B5',
+        backgroundColor: 'rgba(20, 179, 181, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      plugins: {legend: {display: false}},
+      scales: {
+        y: {ticks: {color: '#888'}, grid: {color: '#2a3e4d'}},
+        x: {ticks: {color: '#888'}, grid: {color: '#2a3e4d'}}
+      }
     }
-  </script>
+  })
+} else {
+  ctx.style.display = 'none';
+  document.querySelector('.card b').insertAdjacentHTML('afterend', '<p style="color:#888">Grafik akan muncul setelah ada transaksi</p>')
+}
+</script>
 </body>
 </html>
