@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NusaPOS Mobile - Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nusanavy: '#0F2537',
+            nusatosca: '#14B3B5',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
+
+  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
+    <div class="flex items-center space-x-3">
+      <a href="dashboard.html" class="text-nusatosca font-bold text-sm bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800">
+        ⬅ Dashboard
+      </a>
+    </div>
+    <h1 class="text-md font-bold tracking-wide text-gray-300">Pengaturan Modul</h1>
+  </header>
+
+  <main class="flex-1 overflow-y-auto p-5 space-y-6 pb-24">
+    
+    <div class="space-y-1">
+      <h2 class="text-sm font-bold text-nusatosca uppercase tracking-wider">Fitur & Halaman</h2>
+      <p class="text-xs text-gray-400">Aktifkan halaman modul yang dibutuhkan oleh operasional tokomu.</p>
+    </div>
+
+    <div class="bg-gray-900/40 rounded-2xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
+      
+      <div class="p-4 flex justify-between items-center">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-200">🛒 Modul Transaksi Kasir</h4>
+          <p class="text-[11px] text-gray-500">Membuka fitur penjualan utama untuk kasir.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" checked class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
+        </label>
+      </div>
+
+      <div class="p-4 flex justify-between items-center">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-200">📦 Modul Katalog & Stok</h4>
+          <p class="text-[11px] text-gray-500">Mengelola data master barang jualan.</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" checked class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
+        </label>
+      </div>
+
+      <div class="p-4 flex justify-between items-center">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-400">📊 Laporan Grafik & Omset</h4>
+          <p class="text-[11px] text-gray-600">Melihat statistik omset berkala (Belum Aktif).</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-700 after:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca"></div>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="text-center pt-4">
+      <p class="text-[10px] text-gray-600 uppercase tracking-widest">NusaPOS Mobile v1.0.0-Beta</p>
+    </div>
+
+  </main>
+
+  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
+    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
+      <span class="text-xl">📊</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
+    </a>
+    <a href="setting.html" class="flex flex-col items-center space-y-1 text-nusatosca">
+      <span class="text-xl">⚙️</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Settings</span>
+    </a>
+  </footer>
+
+</body>
+</html>
