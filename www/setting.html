@@ -32,15 +32,14 @@
   <main class="flex-1 overflow-y-auto p-5 space-y-6 pb-24">
     <div class="space-y-1">
       <h2 class="text-sm font-bold text-nusatosca uppercase tracking-wider">Fitur & Halaman</h2>
-      <p class="text-xs text-gray-400">Aktifkan halaman modul yang dibutuhkan oleh operasional tokomu.</p>
+      <p class="text-xs text-gray-400">Aktifkan atau tambah halaman modul baru untuk operasional tokomu.</p>
     </div>
 
     <div class="bg-gray-900/40 rounded-2xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
-      
       <div class="p-4 flex justify-between items-center">
         <div>
           <h4 class="text-sm font-semibold text-gray-200">🛒 Modul Transaksi Kasir</h4>
-          <p class="text-[11px] text-gray-500">Membuka fitur penjualan utama untuk kasir.</p>
+          <p class="text-[11px] text-gray-500">Membuka fitur penjualan utama.</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" id="toggle-kasir" class="sr-only peer" onchange="saveSettings()">
@@ -58,8 +57,37 @@
           <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
         </label>
       </div>
-
     </div>
+
+    <div class="bg-gray-900/60 backdrop-blur p-4 rounded-2xl border border-gray-800 space-y-4 shadow-lg">
+      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">➕ Tambah Modul Halaman Baru</h3>
+      
+      <div class="space-y-3">
+        <div>
+          <label class="text-[11px] text-gray-400 font-bold uppercase block mb-1">Nama Halaman/Menu</label>
+          <input type="text" id="custom-page-name" placeholder="Contoh: Laporan Keuangan, Absensi Kasir" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+        </div>
+        <div>
+          <label class="text-[11px] text-gray-400 font-bold uppercase block mb-1">Pilih Ikon Emoji</label>
+          <select id="custom-page-icon" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+            <option value="📊">📊 Laporan Grafik</option>
+            <option value="👥">👥 Manajemen Karyawan</option>
+            <option value="💸">💸 Biaya Operasional</option>
+            <option value="🔑">🔑 Akses Owner</option>
+          </select>
+        </div>
+        <button onclick="addCustomPage()" class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
+          Simpan Menu Halaman
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Halaman Kustom Milikmu</h3>
+      <div id="custom-pages-list" class="bg-gray-900/40 rounded-2xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
+        </div>
+    </div>
+
   </main>
 
   <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
@@ -77,18 +105,71 @@
     function saveSettings() {
       const kasirActive = document.getElementById('toggle-kasir').checked;
       const katalogActive = document.getElementById('toggle-katalog').checked;
-      
       localStorage.setItem('modul_kasir', kasirActive);
       localStorage.setItem('modul_katalog', katalogActive);
     }
 
-    // Load status saat halaman dibuka
-    document.addEventListener("DOMContentLoaded", () => {
-      const kasir = localStorage.getItem('modul_kasir') !== 'false'; // default true
-      const katalog = localStorage.getItem('modul_katalog') !== 'false'; // default true
+    // Fungsi Tambah Halaman Kustom Baru
+    function addCustomPage() {
+      const nameInput = document.getElementById('custom-page-name');
+      const iconInput = document.getElementById('custom-page-icon');
       
-      document.getElementById('toggle-kasir').checked = kasir;
-      document.getElementById('toggle-katalog').checked = katalog;
+      if (!nameInput.value.trim()) {
+        alert('Nama halaman tidak boleh kosong!');
+        return;
+      }
+
+      let customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      
+      // Simpan data halaman baru
+      customPages.push({
+        id: 'page_' + Date.now(),
+        name: nameInput.value.trim(),
+        icon: iconInput.value,
+        url: '#' // Nanti bisa diarahkan ke file HTML kustom baru
+      });
+
+      localStorage.setItem('custom_pages', JSON.stringify(customPages));
+      nameInput.value = ''; // Reset form
+      renderCustomPages();
+    }
+
+    // Fungsi Hapus Halaman Kustom
+    window.deletePage = function(pageId) {
+      let customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      customPages = customPages.filter(p => p.id !== pageId);
+      localStorage.setItem('custom_pages', JSON.stringify(customPages));
+      renderCustomPages();
+    }
+
+    // Tampilkan daftar halaman kustom di setting
+    function renderCustomPages() {
+      const container = document.getElementById('custom-pages-list');
+      const customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      
+      if (customPages.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-500 text-xs py-4">Belum ada halaman kustom</p>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      customPages.forEach(page => {
+        const row = document.createElement('div');
+        row.className = 'p-4 flex justify-between items-center';
+        row.innerHTML = `
+          <div>
+            <h4 class="text-sm font-semibold text-gray-200">${page.icon} ${page.name}</h4>
+          </div>
+          <button onclick="deletePage('${page.id}')" class="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded-lg">Hapus</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('toggle-kasir').checked = localStorage.getItem('modul_kasir') !== 'false';
+      document.getElementById('toggle-katalog').checked = localStorage.getItem('modul_katalog') !== 'false';
+      renderCustomPages();
     });
   </script>
 </body>
