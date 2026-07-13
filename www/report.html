@@ -2,33 +2,129 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Laporan Bulanan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaPOS Mobile - Rek Koran</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { nusanavy: '#0F2537', nusatosca: '#14B3B5' } } } }
+  </script>
 </head>
-<body class="bg-nusanavy text-white p-6">
-  <h1 class="text-xl font-bold mb-4">Rekap Bulanan</h1>
-  <div id="report-container" class="bg-gray-800 p-4 rounded-lg">
-    <p>Menghitung data transaksi...</p>
-  </div>
-  <button onclick="generatePDF()" class="mt-4 w-full bg-nusatosca p-3 rounded-lg font-bold">
-    Simpan Laporan PDF
-  </button>
-  <a href="dashboard.html" class="block text-center mt-4 text-gray-400">Kembali ke Dashboard</a>
+<body class="bg-nusanavy font-sans h-screen flex-col text-white">
+
+  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center">
+    <h1 class="text-sm font-bold">Rek Koran Transaksi</h1>
+    <select id="pilih-bulan" onchange="loadReport()" class="bg-gray-900 text-xs p-2 rounded text-nusatosca">
+    </select>
+  </header>
+
+  <main class="flex-1 overflow-y-auto p-5 pb-24">
+    <div class="bg-gray-900/50 p-4 rounded-2xl mb-4 flex justify-between">
+      <div>
+        <p class="text- text-gray-400">Total Transaksi</p>
+        <p id="total-trx" class="text-xl font-bold">0</p>
+      </div>
+      <div class="text-right">
+        <p class="text- text-gray-400">Total Omset</p>
+        <p id="total-omset" class="text-xl font-bold text-nusatosca">Rp 0</p>
+      </div>
+    </div>
+
+    <div id="list-transaksi" class="space-y-3">
+      <p class="text-center text-gray-500 text-sm py-8">Pilih bulan untuk melihat data</p>
+    </div>
+
+    <button onclick="exportBulanIni()" class="w-full mt-4 bg-nusatosca text-nusanavy font-bold py-3 rounded-xl">
+      Export Bulan Ini ke .JSON
+    </button>
+  </main>
+
+  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 border-t border-gray-900 p-3 flex justify-around">
+    <a href="dashboard.html" class="text-gray-500">📊<br><span>Dashboard</span></a>
+    <a href="report.html" class="text-nusatosca">📄<br><span>Rek Koran</span></a>
+    <a href="setting.html" class="text-gray-500">⚙️<br><span>Settings</span></a>
+  </footer>
 
   <script>
-    // 1. Ambil data transaksi dari memori HP
-    const history = JSON.parse(localStorage.getItem('transaction_history') || '[]');
-    
-    // 2. Tampilkan ringkasan singkat
-    const total = history.reduce((sum, t) => sum + t.total, 0);
-    document.getElementById('report-container').innerHTML = `
-      <p>Total Transaksi: ${history.length}</p>
-      <p class="text-2xl font-black text-nusatosca">Omset: Rp ${total.toLocaleString()}</p>
-    `;
+    let db;
+    let dataBulanTerpilih = [];
 
-    // 3. Fungsi ini akan kita kembangkan untuk cetak PDF
-    function generatePDF() {
-      alert("Fitur simpan PDF sedang disiapkan! Data omset kamu: Rp " + total.toLocaleString());
+    document.addEventListener("DOMContentLoaded", () => {
+      const request = indexedDB.open("NUSAPOS_DB", 1);
+      request.onsuccess = (e) => { 
+        db = e.target.result; 
+        isiDropdownBulan();
+        loadReport(); // load bulan ini otomatis
+      };
+    });
+
+    async function getAllData(storeName) {
+        return new Promise((resolve) => {
+            db.transaction(storeName, "readonly").objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
+        });
+    }
+
+    function isiDropdownBulan() {
+      const select = document.getElementById('pilih-bulan');
+      const sekarang = new Date();
+      for(let i = 0; i < 6; i++) { // 6 bulan kebelakang
+        const d = new Date(sekarang.getFullYear(), sekarang.getMonth() - i, 1);
+        const bulan = d.getMonth() + 1;
+        const tahun = d.getFullYear();
+        const option = document.createElement('option');
+        option.value = `${bulan}-${tahun}`;
+        option.text = d.toLocaleDateString('id-ID', {month: 'long', year: 'numeric'});
+        select.appendChild(option);
+      }
+    }
+
+    async function loadReport() {
+      const transaksi = await getAllData('transaksi');
+      const [bulan, tahun] = document.getElementById('pilih-bulan').value.split('-');
+      
+      dataBulanTerpilih = transaksi.filter(t => {
+          const tgl = new Date(t.tanggal);
+          return tgl.getMonth() + 1 == bulan && tgl.getFullYear() == tahun;
+      });
+
+      const totalOmset = dataBulanTerpilih.reduce((sum, t) => sum + t.total, 0);
+      document.getElementById('total-trx').innerText = dataBulanTerpilih.length;
+      document.getElementById('total-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+
+      const list = document.getElementById('list-transaksi');
+      list.innerHTML = '';
+      if(dataBulanTerpilih.length === 0) {
+        list.innerHTML = `<p class="text-center text-gray-500">Tidak ada transaksi di bulan ini</p>`;
+        return;
+      }
+
+      dataBulanTerpilih.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)); // terbaru di atas
+      dataBulanTerpilih.forEach(t => {
+        const tgl = new Date(t.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+        const item = document.createElement('div');
+        item.className = "bg-gray-900/40 p-3 rounded-xl flex justify-between";
+        item.innerHTML = `
+          <div>
+            <p class="text-xs text-gray-400">${tgl}</p>
+            <p class="text-xs">${t.items.length} Item</p>
+          </div>
+          <p class="font-bold text-nusatosca">Rp ${t.total.toLocaleString('id-ID')}</p>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    async function exportBulanIni() {
+      const [bulan, tahun] = document.getElementById('pilih-bulan').value.split('-');
+      const dataBackup = { nama_toko: "NUSAPOS", periode: `${bulan}-${tahun}`, data_transaksi: dataBulanTerpilih };
+      const namaFile = `RekKoran_NUSAPOS_${bulan}-${tahun}.json`;
+      const blob = new Blob([JSON.stringify(dataBackup, null, 2)], {type: "application/json"});
+      try {
+          const handle = await window.showSaveFilePicker({ suggestedName: namaFile });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          alert(`Export ${namaFile} Berhasil!`);
+      } catch(err) {}
     }
   </script>
 </body>
