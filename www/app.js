@@ -11,21 +11,16 @@ request.onupgradeneeded = (e) => {
 
 request.onsuccess = (e) => {
     db = e.target.result;
-    // Trigger event agar halaman tahu DB siap
+    // Beritahu halaman bahwa database sudah siap
     window.dispatchEvent(new Event('db-ready'));
 };
 
-window.saveTransaction = async (data) => {
+// Fungsi Helper
+window.getAllData = (storeName) => {
     return new Promise((resolve) => {
-        const tx = db.transaction('transaksi', 'readwrite');
-        tx.objectStore('transaksi').add(data);
-        tx.oncomplete = () => resolve();
-    });
-};
-
-window.getAllData = async (store) => {
-    return new Promise((resolve) => {
-        const req = db.transaction(store, "readonly").objectStore(store).getAll();
+        const tx = db.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
+        const req = store.getAll();
         req.onsuccess = () => resolve(req.result);
     });
 };
