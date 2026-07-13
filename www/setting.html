@@ -30,7 +30,6 @@
   </header>
 
   <main class="flex-1 overflow-y-auto p-5 space-y-6 pb-24">
-    
     <div class="space-y-1">
       <h2 class="text-sm font-bold text-nusatosca uppercase tracking-wider">Fitur & Halaman</h2>
       <p class="text-xs text-gray-400">Aktifkan halaman modul yang dibutuhkan oleh operasional tokomu.</p>
@@ -44,7 +43,7 @@
           <p class="text-[11px] text-gray-500">Membuka fitur penjualan utama untuk kasir.</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" checked class="sr-only peer">
+          <input type="checkbox" id="toggle-kasir" class="sr-only peer" onchange="saveSettings()">
           <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
         </label>
       </div>
@@ -55,28 +54,12 @@
           <p class="text-[11px] text-gray-500">Mengelola data master barang jualan.</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" checked class="sr-only peer">
+          <input type="checkbox" id="toggle-katalog" class="sr-only peer" onchange="saveSettings()">
           <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
         </label>
       </div>
 
-      <div class="p-4 flex justify-between items-center">
-        <div>
-          <h4 class="text-sm font-semibold text-gray-400">📊 Laporan Grafik & Omset</h4>
-          <p class="text-[11px] text-gray-600">Melihat statistik omset berkala (Belum Aktif).</p>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer">
-          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-700 after:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca"></div>
-        </label>
-      </div>
-
     </div>
-
-    <div class="text-center pt-4">
-      <p class="text-[10px] text-gray-600 uppercase tracking-widest">NusaPOS Mobile v1.0.0-Beta</p>
-    </div>
-
   </main>
 
   <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
@@ -90,5 +73,23 @@
     </a>
   </footer>
 
+  <script>
+    function saveSettings() {
+      const kasirActive = document.getElementById('toggle-kasir').checked;
+      const katalogActive = document.getElementById('toggle-katalog').checked;
+      
+      localStorage.setItem('modul_kasir', kasirActive);
+      localStorage.setItem('modul_katalog', katalogActive);
+    }
+
+    // Load status saat halaman dibuka
+    document.addEventListener("DOMContentLoaded", () => {
+      const kasir = localStorage.getItem('modul_kasir') !== 'false'; // default true
+      const katalog = localStorage.getItem('modul_katalog') !== 'false'; // default true
+      
+      document.getElementById('toggle-kasir').checked = kasir;
+      document.getElementById('toggle-katalog').checked = katalog;
+    });
+  </script>
 </body>
 </html>
