@@ -1,23 +1,20 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>Settings</title>
   <style>
-    body { background: #0F2537; color: white; font-family: sans-serif; padding: 20px; }
-    input { width: 100%; padding: 10px; margin: 10px 0; background: #1B365D; color: white; border: none; border-radius: 5px; }
-    button { background: #00B5B5; width: 100%; padding: 10px; border: none; font-weight: bold; cursor: pointer; }
+    body { background: #0F2537; color: white; padding: 15px; font-family: sans-serif; }
+    input { width: 100%; padding: 10px; margin: 10px 0; background: #1B365D; color: white; border: none; }
   </style>
 </head>
 <body>
   <h2>Pengaturan Toko</h2>
-  <input id="toko" placeholder="Nama Toko">
-  <input id="wa" placeholder="Nomor WA">
-  <button onclick="save()">SIMPAN</button>
+  <input id="nama" placeholder="Nama Toko">
+  <button onclick="save()" style="background:#00B5B5; width:100%; padding:10px;">SIMPAN</button>
   <script>
     function save() {
-      const data = { nama: document.getElementById('toko').value, wa: document.getElementById('wa').value };
-      localStorage.setItem('nusa_settings', JSON.stringify(data));
+      localStorage.setItem('toko_name', document.getElementById('nama').value);
       alert("Tersimpan!");
     }
   </script>
