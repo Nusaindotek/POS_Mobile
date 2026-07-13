@@ -1,22 +1,31 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Settings</title>
-  <style>
-    body { background: #0F2537; color: white; padding: 15px; font-family: sans-serif; }
-    input { width: 100%; padding: 10px; margin: 10px 0; background: #1B365D; color: white; border: none; }
-  </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Pengaturan Toko</h2>
-  <input id="nama" placeholder="Nama Toko">
-  <button onclick="save()" style="background:#00B5B5; width:100%; padding:10px;">SIMPAN</button>
-  <script>
-    function save() {
-      localStorage.setItem('toko_name', document.getElementById('nama').value);
-      alert("Tersimpan!");
-    }
-  </script>
+    <div class="container">
+        <h2>Info Toko</h2>
+        <div class="card">
+            <input type="text" id="namaToko" placeholder="Nama Toko">
+            <input type="text" id="alamat" placeholder="Alamat">
+            <button onclick="simpanSetting()">Simpan Info Toko</button>
+        </div>
+    </div>
+    <nav>
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="catalog.html" class="nav-btn">Katalog</a>
+        <a href="setting.html" class="nav-btn">Setting</a>
+    </nav>
+    <script src="app.js"></script>
+    <script>
+        function simpanSetting() {
+            const data = {
+                nama: document.getElementById('namaToko').value,
+                alamat: document.getElementById('alamat').value
+            };
+            simpanData('infoToko', data);
+        }
+    </script>
 </body>
 </html>
