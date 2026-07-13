@@ -2,219 +2,40 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NusaPOS Mobile - Kasir</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            nusanavy: '#0F2537',
-            nusatosca: '#14B3B5',
-          }
-        }
-      }
-    }
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaPOS Kasir</title>
+  <style>
+    :root { --navy: #1B365D; --tosca: #00B5B5; --bg: #0F2537; }
+    body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; }
+    .header { padding: 15px; border-bottom: 2px solid var(--tosca); display: flex; justify-content: space-between; }
+    .btn { background: var(--tosca); color: var(--bg); padding: 15px; border-radius: 10px; width: 100%; border: none; font-weight: bold; }
+  </style>
 </head>
-<body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
-
-  <header class="bg-nusanavy border-b border-gray-800 pt-6 pb-4 px-4 flex justify-between items-center shadow-md">
-    <div class="flex items-center space-x-3">
-      <a href="dashboard.html" class="text-nusatosca font-bold text-xs bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
-        ⬅ Menu
-      </a>
-      <img src="../icon.png" alt="Logo" class="w-7 h-7 object-contain">
-      <h1 class="text-sm font-bold tracking-wide">NusaPOS Kasir</h1>
-    </div>
-    <span id="clock" class="text-xs font-mono text-nusatosca font-bold bg-gray-900/40 px-2 py-1 rounded">00:00</span>
-  </header>
-
-  <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
-    
-    <div class="bg-gray-900/60 backdrop-blur p-4 rounded-xl border border-gray-800 space-y-2 shadow-inner">
-      <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Pilih Produk (Simulasi Scan/Katalog)</span>
-      <div class="flex space-x-2">
-        <select id="product-picker" class="flex-1 bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-          </select>
-        <button onclick="addToCart()" class="bg-nusatosca text-nusanavy px-4 rounded-lg text-sm font-bold shadow-md hover:bg-teal-400 active:scale-95 transition">
-          + Tambah
-        </button>
-      </div>
-    </div>
-
-    <div class="bg-gray-900/40 rounded-xl border border-gray-800 overflow-hidden shadow-lg">
-      <div class="bg-gray-900/80 p-3 border-b border-gray-800 flex justify-between items-center">
-        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Item dalam Keranjang</span>
-        <span class="text-xs font-bold bg-nusatosca/20 text-nusatosca px-2 py-0.5 rounded-full" id="total-items">0 Barang</span>
-      </div>
-      
-      <div class="p-3 divide-y divide-gray-800/60 space-y-2 overflow-y-auto max-h-64" id="cart-list">
-        </div>
-    </div>
-
-  </main>
-
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-4 shadow-2xl flex items-center justify-between z-50">
-    <div>
-      <span class="text-[10px] text-gray-500 block font-bold uppercase tracking-wider">Total Tagihan</span>
-      <span class="text-xl font-black text-nusatosca tracking-tight" id="grand-total">Rp 0</span>
-    </div>
-    <button onclick="checkout()" class="bg-nusatosca hover:bg-teal-400 active:scale-95 text-nusanavy font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-nusatosca/20 transition duration-150 text-sm tracking-wider uppercase">
-      Bayar Sekarang
-    </button>
-  </footer>
-
-  <div id="receipt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white text-gray-900 w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4 font-mono text-xs">
-      <div class="text-center border-b border-dashed border-gray-400 pb-3">
-        <h3 class="font-bold text-sm">=== NUSA POS ===</h3>
-        <p class="text-[10px] text-gray-500">Struk Pembayaran Digital</p>
-      </div>
-      <div id="receipt-items" class="space-y-1">
-        </div>
-      <div class="border-t border-dashed border-gray-400 pt-3 space-y-1">
-        <div class="flex justify-between font-bold text-sm">
-          <span>TOTAL:</span>
-          <span id="receipt-total">Rp 0</span>
-        </div>
-      </div>
-      <div class="text-center text-[10px] text-gray-400 pt-2">
-        Terima Kasih Atas Kunjungan Anda<br>Status: SUKSES
-      </div>
-      <button onclick="closeModal()" class="w-full bg-nusanavy text-white font-sans font-bold py-2 rounded-xl text-center active:scale-95 transition">
-        Tutup & Transaksi Baru
-      </button>
-    </div>
+<body>
+  <div class="header"><h1>Kasir</h1> <a href="dashboard.html" style="color:var(--tosca)">← Menu</a></div>
+  <div style="padding: 15px;">
+    <select id="prod" style="width:100%; padding:10px; background:var(--navy); color:white;">
+      <option value="15000|Kopi Susu">Kopi Susu - Rp 15.000</option>
+    </select>
+    <button class="btn" onclick="tambah()" style="margin-top:10px;">TAMBAH</button>
   </div>
-
+  <div id="cart" style="padding: 15px;"></div>
+  <button class="btn" style="position:fixed; bottom:10px; width:90%; left:5%;" onclick="checkout()">BAYAR</button>
+  
+  <script src="app.js"></script>
   <script>
-    const defaultProducts = [
-      { id: 'p1', name: 'Kopi Susu Aren', price: 22000 },
-      { id: 'p2', name: 'Roti Bakar Cokelat', price: 15000 },
-      { id: 'p3', name: 'Es Teh Manis Jumbo', price: 7000 },
-      { id: 'p4', name: 'Kentang Goreng Krispi', price: 18000 }
-    ];
-
     let cart = [];
-
-    function initProducts() {
-      const savedCatalog = JSON.parse(localStorage.getItem('catalog_products')) || defaultProducts;
-      const picker = document.getElementById('product-picker');
-      picker.innerHTML = '';
-      
-      savedCatalog.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.innerText = `${p.name} - Rp ${p.price.toLocaleString('id-ID')}`;
-        picker.appendChild(opt);
-      });
+    function tambah() {
+      const val = document.getElementById('prod').value.split('|');
+      cart.push({nama: val[1], harga: parseInt(val[0])});
+      alert("Ditambahkan!");
     }
-
-    function addToCart() {
-      const picker = document.getElementById('product-picker');
-      const savedCatalog = JSON.parse(localStorage.getItem('catalog_products')) || defaultProducts;
-      const selectedProd = savedCatalog.find(p => p.id === picker.value);
-
-      if (!selectedProd) return;
-
-      const existing = cart.find(item => item.id === selectedProd.id);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ ...selectedProd, qty: 1 });
-      }
-
-      renderCart();
-    }
-
-    function changeQty(id, delta) {
-      const item = cart.find(p => p.id === id);
-      if (!item) return;
-      
-      item.qty += delta;
-      if (item.qty <= 0) {
-        cart = cart.filter(p => p.id !== id);
-      }
-      renderCart();
-    }
-
-    function renderCart() {
-      const container = document.getElementById('cart-list');
-      container.innerHTML = '';
-      
-      let totalQty = 0;
-      let grandTotal = 0;
-
-      if (cart.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 text-xs py-8">Keranjang belanja masih kosong.</p>`;
-      }
-
-      cart.forEach(item => {
-        totalQty += item.qty;
-        grandTotal += (item.price * item.qty);
-
-        const row = document.createElement('div');
-        row.className = "flex justify-between items-center py-2 border-b border-gray-800/40";
-        row.innerHTML = `
-          <div>
-            <h4 class="text-xs font-bold text-gray-200">${item.name}</h4>
-            <p class="text-[10px] text-nusatosca">Rp ${item.price.toLocaleString('id-ID')} x ${item.qty}</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <button onclick="changeQty('${item.id}', -1)" class="w-6 h-6 bg-gray-800 rounded-md font-bold text-xs text-red-400 active:scale-95">-</button>
-            <span class="text-xs font-bold px-1">${item.qty}</span>
-            <button onclick="changeQty('${item.id}', 1)" class="w-6 h-6 bg-gray-800 rounded-md font-bold text-xs text-nusatosca active:scale-95">+</button>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-
-      document.getElementById('total-items').innerText = `${totalQty} Barang`;
-      document.getElementById('grand-total').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
-    }
-
-    function checkout() {
-      if (cart.length === 0) {
-        alert('Keranjang belanja kosong! Tambahkan produk dulu.');
-        return;
-      }
-
-      const receiptItems = document.getElementById('receipt-items');
-      receiptItems.innerHTML = '';
-      let total = 0;
-
-      cart.forEach(item => {
-        total += (item.price * item.qty);
-        const div = document.createElement('div');
-        div.className = "flex justify-between";
-        div.innerHTML = `
-          <span>${item.name} x${item.qty}</span>
-          <span>Rp ${(item.price * item.qty).toLocaleString('id-ID')}</span>
-        `;
-        receiptItems.appendChild(div);
-      });
-
-      document.getElementById('receipt-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
-      document.getElementById('receipt-modal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('receipt-modal').classList.add('hidden');
+    async function checkout() {
+      const total = cart.reduce((a, b) => a + b.harga, 0);
+      await window.saveTransaction({tanggal: new Date(), items: cart, total: total});
+      alert("Transaksi Sukses!");
       cart = [];
-      renderCart();
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      initProducts();
-      renderCart();
-    });
-
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    }, 1000);
   </script>
 </body>
 </html>
