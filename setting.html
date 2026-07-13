@@ -39,11 +39,15 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <input class="input" id="namaToko" placeholder="🏪 Nama Toko">
     <input class="input" id="alamatToko" placeholder="📍 Alamat">
     <input class="input" id="noHp" placeholder="📞 Nomor HP">
-    <div style="display:flex; gap:8px">
-      <input class="input" id="pajak" type="number" value="10" placeholder="Pajak %">
-      <select class="input" id="ukuranKertas"><option>58 mm</option><option>80 mm</option></select>
-    </div>
+    
+    <!-- PAJAK SUDAH DIHAPUS. TINGGAL UKURAN KERTAS SAJA -->
+    <select class="input" id="ukuranKertas">
+      <option>58 mm</option>
+      <option>80 mm</option>
+    </select>
+    
     <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
+    
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
 
@@ -61,12 +65,17 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
   </div>
 
 <script>
-// Load data saat buka
-document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
-document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
-document.getElementById('logo-preview').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/70/F5F7FA/888?text=🏪';
-document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
-document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
+// LOAD DATA SAAT BUKA HALAMAN - SUDAH DITAMBAH NOHP & FOOTER
+window.onload = function(){
+  document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
+  document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
+  document.getElementById('noHp').value = localStorage.getItem('noHp') || ''; // INI YANG DITAMBAH
+  document.getElementById('ukuranKertas').value = localStorage.getItem('ukuranKertas') || '58 mm';
+  document.getElementById('footer').value = localStorage.getItem('footer') || ''; // INI YANG DITAMBAH
+  document.getElementById('logo-preview').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/70/F5F7FA/888?text=🏪';
+  document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
+  document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
+}
 
 // Fitur upload logo
 document.getElementById('uploadLogo').addEventListener('change', function(e){
@@ -74,14 +83,19 @@ document.getElementById('uploadLogo').addEventListener('change', function(e){
   const reader = new FileReader();
   reader.onload = function(event){
     document.getElementById('logo-preview').src = event.target.result;
-    localStorage.setItem('logoToko', event.target.result); // simpan ke localStorage
+    localStorage.setItem('logoToko', event.target.result);
   }
   reader.readAsDataURL(file);
 })
 
 function simpanInfo(){
+  // SIMPAN SEMUA TERMASUK NOHP & FOOTER
   localStorage.setItem('namaToko', document.getElementById('namaToko').value);
   localStorage.setItem('alamatToko', document.getElementById('alamatToko').value);
+  localStorage.setItem('noHp', document.getElementById('noHp').value); // INI YANG DITAMBAH
+  localStorage.setItem('ukuranKertas', document.getElementById('ukuranKertas').value);
+  localStorage.setItem('footer', document.getElementById('footer').value); // INI YANG DITAMBAH
+  
   document.getElementById('nama-toko-view').innerText = document.getElementById('namaToko').value;
   document.getElementById('alamat-view').innerText = document.getElementById('alamatToko').value;
   alert('Info Toko Tersimpan!');
