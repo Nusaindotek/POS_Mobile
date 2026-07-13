@@ -1,4 +1,8 @@
-:root { --navy: #1B365D; --tosca: #00B5B5; --bg: #0F2537; }
-body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-.card { background: var(--navy); padding: 16px; border-radius: 12px; margin: 15px; border: 1px solid #2a3e4d; }
-.btn-tosca { background: var(--tosca); color: var(--bg); padding: 14px; width: 100%; border: none; border-radius: 8px; font-weight: bold; }
+/* style.css - Semua halaman gunakan ini */
+body { font-family: sans-serif; background-color: #f1f5f9; margin: 0; padding-bottom: 80px; }
+.container { padding: 20px; }
+.card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+button { width: 100%; padding: 12px; background: #0ea5e9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+nav { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background: white; padding: 10px 0; border-top: 1px solid #e2e8f0; }
+.nav-btn { text-decoration: none; color: #64748b; font-size: 12px; text-align: center; }
