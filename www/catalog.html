@@ -1,20 +1,58 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog - NusaPOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
         <h2>Katalog Barang</h2>
+        
         <div class="card">
-            <p>Daftar produk akan muncul di sini</p>
+            <input type="text" id="namaBarang" placeholder="Nama Barang">
+            <input type="number" id="hargaBarang" placeholder="Harga Barang (Rp)">
+            <button onclick="tambahBarang()" style="background: #0ea5e9;">Simpan Barang</button>
         </div>
+
+        <h3>Daftar Produk</h3>
+        <div id="listBarang"></div>
     </div>
+
     <nav>
-        <a href="index.html" class="nav-btn">Home</a>
-        <a href="catalog.html" class="nav-btn">Katalog</a>
-        <a href="setting.html" class="nav-btn">Setting</a>
+        <a href="index.html" class="nav-item">Dashboard</a>
+        <a href="catalog.html" class="nav-item">Katalog</a>
+        <a href="setting.html" class="nav-item">Setting</a>
     </nav>
+
     <script src="app.js"></script>
+    <script>
+        function tambahBarang() {
+            const nama = document.getElementById('namaBarang').value;
+            const harga = document.getElementById('hargaBarang').value;
+            
+            if(!nama || !harga) return alert("Mohon isi nama dan harga!");
+
+            let daftar = ambilDariLocalStorage('daftarBarang') || [];
+            daftar.push({ nama, harga });
+            simpanKeLocalStorage('daftarBarang', daftar);
+            
+            location.reload(); // Refresh untuk update list
+        }
+
+        // Tampilkan barang saat halaman dimuat
+        window.onload = () => {
+            const daftar = ambilDariLocalStorage('daftarBarang') || [];
+            const listDiv = document.getElementById('listBarang');
+            listDiv.innerHTML = daftar.map(b => `
+                <div class="card">
+                    <strong>${b.nama}</strong><br>
+                    <span>Rp ${b.harga}</span>
+                </div>
+            `).join('');
+        };
+    </script>
 </body>
 </html>
