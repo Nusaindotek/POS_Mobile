@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:20px}
+.card{background:#1a2e3d; padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid #2a3e4d}
+.tosca{color:#14B3B5}
+a{color:#14B3B5; text-decoration:none}
+</style>
+</head>
+<body>
+  <h2>Dashboard</h2>
+  <div class="card">
+    <h3>Penjualan Hari Ini</h3>
+    <h1 class="tosca" id="total-hari-ini">Rp 0</h1>
+  </div>
+  <div class="card">
+    <h3>Transaksi Terakhir</h3>
+    <p id="last-transaksi">Belum ada transaksi</p>
+  </div>
+  <a href="index.html">← Kembali ke Menu</a>
+  <script>
+    const last = localStorage.getItem('lastTransaksi');
+    if(last){
+      const data = JSON.parse(last);
+      document.getElementById('total-hari-ini').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
+      document.getElementById('last-transaksi').innerText = `Rp ${data.total.toLocaleString('id-ID')} - ${new Date(data.tanggal).toLocaleTimeString('id-ID')}`;
+    }
+  </script>
+</body>
+</html>
