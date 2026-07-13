@@ -2,48 +2,80 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaPOS - Settings</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0F2537] text-white p-6">
-  <h1 class="font-bold text-lg mb-4">Pengaturan Modul</h1>
-  
-  <div class="bg-gray-900 p-4 rounded-xl mb-6">
-    <input type="text" id="name" placeholder="Nama Menu" class="w-full bg-black p-2 rounded mb-2 text-sm">
-    <input type="text" id="icon" placeholder="Emoji (contoh: 📊)" class="w-full bg-black p-2 rounded mb-2 text-sm">
-    <button onclick="addPage()" class="w-full bg-[#14B3B5] p-2 rounded font-bold">TAMBAH MENU</button>
+<body class="bg-[#0F2537] text-white min-h-screen p-4">
+
+  <div class="flex items-center space-x-3 mb-6 mt-2">
+    <a href="dashboard.html" class="text-nusatosca font-bold text-xs bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800">⬅ Kembali</a>
+    <h1 class="font-bold text-md">Pengaturan Modul</h1>
   </div>
 
-  <div id="list" class="space-y-2"></div>
+  <div class="bg-gray-900/40 p-5 rounded-3xl border border-gray-800 shadow-xl mb-8">
+    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">➕ Tambah Modul Halaman Baru</h2>
+    <div class="space-y-4">
+      <div>
+        <label class="text-[10px] text-gray-500 font-bold uppercase ml-1">Nama Halaman/Menu</label>
+        <input type="text" id="name" placeholder="Contoh: Absensi Kasir" class="w-full bg-[#0F2537] border border-gray-700 rounded-xl p-3 text-sm focus:border-[#14B3B5] outline-none mt-1">
+      </div>
+      <div>
+        <label class="text-[10px] text-gray-500 font-bold uppercase ml-1">Pilih Ikon Emoji</label>
+        <input type="text" id="icon" placeholder="Contoh: 📊" class="w-full bg-[#0F2537] border border-gray-700 rounded-xl p-3 text-sm focus:border-[#14B3B5] outline-none mt-1">
+      </div>
+      <button onclick="addPage()" class="w-full bg-[#14B3B5] text-[#0F2537] font-extrabold py-3.5 rounded-xl text-sm shadow-lg shadow-[#14B3B5]/20 active:scale-[0.98] transition uppercase tracking-wider">
+        Simpan Menu Halaman
+      </button>
+    </div>
+  </div>
+
+  <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 ml-1">Daftar Modul Kustom</h2>
+  <div id="list" class="space-y-3">
+    </div>
 
   <script>
     function render() {
       const list = document.getElementById('list');
       const pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
-      list.innerHTML = pages.map(p => `
-        <div class="flex justify-between items-center bg-gray-800 p-3 rounded">
-          <span>${p.icon} ${p.name}</span>
-          <button onclick="del('${p.id}')" class="text-red-400 text-xs">Hapus</button>
-        </div>
-      `).join('');
+      
+      list.innerHTML = pages.length > 0 
+        ? pages.map(p => `
+          <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800 flex justify-between items-center shadow-md">
+            <div class="flex items-center space-x-4">
+              <span class="text-2xl bg-gray-800 p-2 rounded-xl">${p.icon}</span>
+              <span class="font-bold text-sm">${p.name}</span>
+            </div>
+            <button onclick="del('${p.id}')" class="text-[10px] bg-red-500/10 text-red-500 font-bold px-3 py-1.5 rounded-lg border border-red-500/20 active:scale-95 transition">
+              HAPUS
+            </button>
+          </div>
+        `).join('')
+        : '<p class="text-center text-gray-600 text-xs mt-6 italic">Belum ada modul tambahan.</p>';
     }
 
     function addPage() {
       const name = document.getElementById('name').value;
-      const icon = document.getElementById('icon').value;
-      if(!name) return;
+      const icon = document.getElementById('icon').value || '📁';
+      if(!name) return alert('Nama menu wajib diisi!');
+      
       const pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
       pages.push({id: Date.now().toString(), name, icon});
       localStorage.setItem('custom_pages', JSON.stringify(pages));
+      
+      document.getElementById('name').value = '';
+      document.getElementById('icon').value = '';
       render();
     }
 
     function del(id) {
+      if(!confirm('Yakin ingin menghapus menu ini?')) return;
       let pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
       pages = pages.filter(p => p.id !== id);
       localStorage.setItem('custom_pages', JSON.stringify(pages));
       render();
     }
+    
     render();
   </script>
 </body>
