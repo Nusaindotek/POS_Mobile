@@ -6,6 +6,9 @@
 <style>
 body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 140px 0}
 .header{background:#14B3B5; color:#0F2537; padding:14px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between}
+.kategori-bar{display:flex; gap:8px; padding:10px 12px; overflow-x:auto; background:#1a2e3d}
+.kategori-btn{padding:6px 12px; border:1px solid #14B3B5; border-radius:20px; background:transparent; color:#14B3B5; white-space:nowrap; cursor:pointer; font-size:13px}
+.kategori-btn.active{background:#14B3B5; color:#0F2537}
 .produk-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:12px}
 .produk-card{background:#1a2e3d; padding:10px; border-radius:10px; text-align:center; border:1px solid #2a3e4d}
 .produk-card button{background:#14B3B5; color:#0F2537; border:none; padding:6px; border-radius:6px; width:100%; font-weight:bold; font-size:13px}
@@ -16,11 +19,11 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
 .bottom-nav a.active{color:#14B3B5}
-.bottom-nav a div{font-size:18px; margin-bottom:2px}
 </style>
 </head>
 <body>
   <div class="header">Mesin Kasir <a href="dashboard.html" style="color:#0F2537; text-decoration:none">←</a></div>
+  <div class="kategori-bar" id="kategori-bar"></div>
   <div id="produk-list" class="produk-grid"></div>
   
   <div class="keranjang">
@@ -40,52 +43,38 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 
   <script>
     let keranjang=[];
-    const produk=JSON.parse(localStorage.getItem('produk')) || [
-      {id:1,nama:"yupi",harga:19000},{id:2,nama:"donat",harga:25000},
-    ];
-    document.addEventListener("DOMContentLoaded",()=>{
-      const list=document.getElementById('produk-list');
-      produk.forEach(p=>{
+    let kategoriAktif = "Semua";
+    const produk=JSON.parse(localStorage.getItem('produk')) || [];
+
+    function renderKategori(){
+      const bar = document.getElementById('kategori-bar');
+      const kategori = ["Semua", ...new Set(produk.map(p=>p.kategori))];
+      bar.innerHTML = '';
+      kategori.forEach(k=>{
+        bar.innerHTML += `<button class="kategori-btn ${kategoriAktif===k?'active':''}" onclick="filterKategori('${k}')">${k}</button>`
+      })
+    }
+
+    function filterKategori(k){
+      kategoriAktif = k;
+      renderKategori();
+      renderProduk();
+    }
+
+    function renderProduk(){
+      const list=document.getElementById('produk-list'); list.innerHTML='';
+      const data = kategoriAktif === "Semua" ? produk : produk.filter(p=>p.kategori===kategoriAktif);
+      data.forEach(p=>{
         list.innerHTML+=`<div class="produk-card"><b>${p.nama}</b><br><span style="color:#14B3B5">Rp ${p.harga.toLocaleString('id-ID')}</span><button onclick="tambah(${p.id})">+ Tambah</button></div>`
       })
-    })
-    function tambah(id){
-      const item=produk.find(p=>p.id===id);
-      const ada=keranjang.find(k=>k.id===id);
-      if(ada) ada.qty++; else keranjang.push({...item,qty:1});
-      render()
     }
-    function kurang(id){
-      const ada=keranjang.find(k=>k.id===id);
-      if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);
-      render()
-    }
-    function render(){
-      let total=0;
-      const list=document.getElementById('list-keranjang');
-      list.innerHTML='';
-      if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}
-      keranjang.forEach(i=>{
-        total+=i.harga*i.qty;
-        list.innerHTML+=`<div class="keranjang-item">
-          <span>${i.nama}</span>
-          <div>
-            <button class="qty-btn" onclick="kurang(${i.id})">-</button>
-            <span style="margin:0 8px">${i.qty}</span>
-            <button class="qty-btn" onclick="tambah(${i.id})">+</button>
-            <span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span>
-          </div>
-        </div>`
-      });
-      document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`
-    }
-    function simpanTransaksi(){
-      if(keranjang.length===0)return alert("Keranjang kosong");
-      const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
-      localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
-      alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
-      keranjang=[];render()
-    }
+
+    function tambah(id){const item=produk.find(p=>p.id===id);const ada=keranjang.find(k=>k.id===id);if(ada) ada.qty++; else keranjang.push({...item,qty:1});render()}
+    function kurang(id){const ada=keranjang.find(k=>k.id===id);if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);render()}
+    function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div class="keranjang-item"><span>${i.nama}</span><div><button class="qty-btn" onclick="kurang(${i.id})">-</button><span style="margin:0 8px">${i.qty}</span><button class="qty-btn" onclick="tambah(${i.id})">+</button><span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div></div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`}
+    function simpanTransaksi(){if(keranjang.length===0)return alert("Keranjang kosong");const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);keranjang=[];render()}
+    
+    renderKategori(); renderProduk();
   </script>
 </body>
 </html>
