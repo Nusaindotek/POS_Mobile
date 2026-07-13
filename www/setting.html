@@ -1,31 +1,66 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting - NusaPOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
         <h2>Info Toko</h2>
         <div class="card">
             <input type="text" id="namaToko" placeholder="Nama Toko">
             <input type="text" id="alamat" placeholder="Alamat">
+            <input type="number" id="noHp" placeholder="Nomor HP">
+            
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="pajak" placeholder="Pajak (%)">
+                <select id="ukuranKertas">
+                    <option value="58">58 mm</option>
+                    <option value="80">80 mm</option>
+                </select>
+            </div>
+            
+            <textarea id="footer" placeholder="Footer Struk (opsional)"></textarea>
             <button onclick="simpanSetting()">Simpan Info Toko</button>
         </div>
     </div>
+
     <nav>
-        <a href="index.html" class="nav-btn">Home</a>
-        <a href="catalog.html" class="nav-btn">Katalog</a>
-        <a href="setting.html" class="nav-btn">Setting</a>
+        <a href="index.html" class="nav-item">Dashboard</a>
+        <a href="report.html" class="nav-item">Laporan</a>
+        <a href="setting.html" class="nav-item">Setting</a>
     </nav>
+
     <script src="app.js"></script>
     <script>
+        // Fungsi khusus untuk halaman ini
         function simpanSetting() {
             const data = {
                 nama: document.getElementById('namaToko').value,
-                alamat: document.getElementById('alamat').value
+                alamat: document.getElementById('alamat').value,
+                hp: document.getElementById('noHp').value,
+                pajak: document.getElementById('pajak').value,
+                ukuran: document.getElementById('ukuranKertas').value,
+                footer: document.getElementById('footer').value
             };
-            simpanData('infoToko', data);
+            simpanKeLocalStorage('infoToko', data);
         }
+
+        // Memuat data saat halaman dibuka
+        window.onload = () => {
+            const saved = ambilDariLocalStorage('infoToko');
+            if(saved) {
+                document.getElementById('namaToko').value = saved.nama || '';
+                document.getElementById('alamat').value = saved.alamat || '';
+                document.getElementById('noHp').value = saved.hp || '';
+                document.getElementById('pajak').value = saved.pajak || '';
+                document.getElementById('ukuranKertas').value = saved.ukuran || '58';
+                document.getElementById('footer').value = saved.footer || '';
+            }
+        };
     </script>
 </body>
 </html>
