@@ -4,47 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NusaPOS Mobile - Settings</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { theme: { extend: { colors: { nusanavy: '#0F2537', nusatosca: '#14B3B5' }
-  </script>
+  <style>
+    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 80px; }
+    .header { padding: 15px; border-bottom: 1px solid #2a3e4d; }
+    .card { background: #1a2e3d; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #2a3e4d; }
+    .card-red { background: #3d1a1a; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #5d2a2a; }
+    .btn-tosca { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; }
+    .btn-red { background: #E63946; color: white; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; }
+    .title { color: #aaa; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+    .title-red { color: #ff8a8a; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+    .desc { color: #aaa; font-size: 11px; margin-top: 8px; }
+    .desc-red { color: #ff8a8a; font-size: 11px; margin-top: 8px; }
+    .footer { position: fixed; bottom: 0; width: 100%; background: #0a141c; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #2a3e4d; }
+    .footer a { color: #888; text-decoration: none; text-align: center; font-size: 12px; }
+    .footer .active { color: #14B3B5; }
+  </style>
 </head>
-<body class="bg-nusanavy font-sans h-screen flex-col text-white">
+<body>
 
-  <header class="bg-nusanavy border-b border-gray-800 p-4">
-    <h1 class="text-sm font-bold">Settings</h1>
-  </header>
+  <div class="header">
+    <h1 style="font-size:16px; margin:0;">Settings</h1>
+  </div>
 
-  <main class="flex-1 overflow-y-auto p-5 space-y-4 pb-24">
-    
-    <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800">
-      <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Backup & Data</h3>
-      
-      <button onclick="backupRekKoran(new Date().getMonth()+1, new Date().getFullYear())" 
-        class="w-full bg-nusatosca text-nusanavy font-bold py-3 rounded-xl mb-3">
-        Backup Bulan Ini Manual
-      </button>
-      <p class="text-[10px] text-gray-400">Auto backup akan jalan tiap tgl 1 jam 00:01</p>
-    </div>
+  <div class="card">
+    <div class="title">BACKUP & DATA</div>
+    <button onclick="backupRekKoran(new Date().getMonth()+1, new Date().getFullYear())" class="btn-tosca">
+      Backup Bulan Ini Manual
+    </button>
+    <p class="desc">Auto backup akan jalan tiap tgl 1 jam 00:01</p>
+  </div>
 
-    <div class="bg-red-900/30 p-4 rounded-2xl border-red-800">
-      <h3 class="text-xs font-bold text-red-400 uppercase mb-3">Zona Bahaya</h3>
-      
-      <button onclick="hapusSemuaData()" 
-        class="w-full bg-red-600 text-white font-bold py-3 rounded-xl">
-        HAPUS SEMUA DATA TRANSAKSI
-      </button>
-      <p class="text-[10px] text-red-300 mt-2">Data transaksi akan dihapus permanen. Grafik & Omset jadi 0</p>
-    </div>
+  <div class="card-red">
+    <div class="title-red">ZONA BAHAYA</div>
+    <button onclick="hapusSemuaData()" class="btn-red">
+      HAPUS SEMUA DATA TRANSAKSI
+    </button>
+    <p class="desc-red">Data transaksi akan dihapus permanen. Grafik & Omset jadi 0</p>
+  </div>
 
-  </main>
+  <div class="footer">
+    <a href="dashboard.html">📊<br>Dashboard</a>
+    <a href="setting.html" class="active">⚙️<br>Settings</a>
+  </div>
 
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 border-t border-gray-900 p-3 flex justify-around">
-    <a href="dashboard.html" class="text-gray-500">📊<br><span>Dashboard</span></a>
-    <a href="setting.html" class="text-nusatosca">⚙️<br><span>Settings</span></a>
-  </footer>
-
-  <script src="app.js"></script>
   <script>
     let db;
     document.addEventListener("DOMContentLoaded", () => {
@@ -54,12 +56,10 @@
 
     async function getAllData(storeName) {
         return new Promise((resolve) => {
-            const tx = db.transaction(storeName, "readonly");
-            tx.objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
+            db.transaction(storeName, "readonly").objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
         });
     }
 
-    // FUNGSI BACKUP MANUAL
     async function backupRekKoran(bulan, tahun) {
         const transaksi = await getAllData('transaksi');
         const dataBulanIni = transaksi.filter(t => {
@@ -78,14 +78,13 @@
         } catch(err) { alert("Backup dibatalkan"); }
     }
 
-    // FUNGSI HAPUS DATA
     function hapusSemuaData() {
         if(confirm("Yakin mau hapus SEMUA data transaksi? Tindakan ini tidak bisa dibatalkan!")) {
             const tx = db.transaction('transaksi', 'readwrite');
             tx.objectStore('transaksi').clear();
             tx.oncomplete = () => {
                 alert("Semua data berhasil dihapus!");
-                window.location.href = 'dashboard.html'; // balik ke dashboard
+                window.location.href = 'dashboard.html';
             }
         }
     }
