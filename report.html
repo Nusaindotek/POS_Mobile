@@ -3,21 +3,82 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Laporan</title>
-<style>body{background:#F5F7FA; font-family:Arial; margin:0; padding:0 0 80px 0}
-.header{background:#14B3B5; color:white; padding:16px; font-weight:bold}
-.card{background:white; margin:12px; padding:16px; border-radius:12px}
+<style>
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.card-hari{background:#0F2537; color:white; margin:12px; padding:16px; border-radius:12px}
+.tosca{color:#14B3B5}
+.transaksi-item{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px solid #eee}
+.btn-hapus{background:#ff4d4d; color:white; border:none; padding:8px 12px; border-radius:8px; width:100%; margin-top:10px}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+.bottom-nav a.active{color:#14B3B5}
 </style>
 </head>
 <body>
   <div class="header">Laporan</div>
-  <div class="card">Fitur laporan lengkap v2.1</div>
+  <div id="laporan-list"></div>
+
   <div class="bottom-nav">
-    <a href="dashboard.html">🏠<br>Dashboard</a>
-    <a href="catalog.html">🧾<br>Kasir</a>
-    <a href="report.html">📊<br>Laporan</a>
-    <a href="setting.html">🏪<br>Info Toko</a>
+    <a href="dashboard.html"><div>🏠</div>Dashboard</a>
+    <a href="catalog.html"><div>🧾</div>Kasir</a>
+    <a href="report.html" class="active"><div>📊</div>Laporan</a>
+    <a href="setting.html"><div>🏪</div>Info Toko</a>
   </div>
+  <script>
+    const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
+    
+    // Kelompokkan per tanggal
+    const kelompok = {};
+    riwayat.forEach(trx => {
+      const tgl = new Date(trx.tanggal).toLocaleDateString('id-ID');
+      if(!kelompok[tgl]) kelompok[tgl] = [];
+      kelompok[tgl].push(trx);
+    });
+
+    const list = document.getElementById('laporan-list');
+    
+    if(riwayat.length === 0){
+      list.innerHTML = `<div class="card">Belum ada transaksi</div>`;
+    } else {
+      // Urut dari terbaru
+      Object.keys(kelompok).reverse().forEach(tgl => {
+        const transaksiHariIni = kelompok[tgl];
+        const totalHariIni = transaksiHariIni.reduce((sum, t) => sum + t.total, 0);
+        
+        let html = `<div class="card-hari">
+          <div style="display:flex; justify-content:space-between">
+            <b>${tgl}</b>
+            <b class="tosca">Rp ${totalHariIni.toLocaleString('id-ID')}</b>
+          </div>
+          <small>${transaksiHariIni.length} Transaksi</small>
+        </div>`;
+
+        transaksiHariIni.reverse().forEach(t => {
+          const jam = new Date(t.tanggal).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+          html += `<div class="card">
+            <div class="transaksi-item">
+              <span>#${t.id.toString().slice(-4)} - ${jam}</span>
+              <b class="tosca">Rp ${t.total.toLocaleString('id-ID')}</b>
+            </div>`;
+          t.items.forEach(i => {
+            html += `<div style="font-size:12px; color:#666">${i.nama} x${i.qty}</div>`
+          });
+          html += `</div>`;
+        });
+        list.innerHTML += html;
+      });
+      
+      list.innerHTML += `<button class="btn-hapus" onclick="hapusRiwayat()">Hapus Semua Riwayat</button>`;
+    }
+
+    function hapusRiwayat(){
+      if(confirm("Yakin hapus semua riwayat transaksi?")){
+        localStorage.removeItem('riwayat');
+        location.reload();
+      }
+    }
+  </script>
 </body>
 </html>
