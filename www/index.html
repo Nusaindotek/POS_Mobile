@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
+<html lang="id">
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <div class="card"><h1>Kasir</h1><select id="prod"><option value="10000|Produk A">Produk A</option></select></div>
-  <button class="btn-tosca" style="margin:15px; width:92%" onclick="bayar()">BAYAR</button>
-  <script src="app.js"></script>
-  <script>
-    async function bayar() {
-      await window.saveTransaction({tanggal: new Date().toISOString(), total: 10000});
-      alert("Tersimpan!");
-    }
-  </script>
+    <div class="container">
+        <h2>Dashboard</h2>
+        <div class="card"><h3>Omset Hari Ini: Rp 0</h3></div>
+    </div>
+    <nav>
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="catalog.html" class="nav-btn">Katalog</a>
+        <a href="setting.html" class="nav-btn">Setting</a>
+    </nav>
+    <script src="app.js"></script>
 </body>
 </html>
