@@ -2,25 +2,21 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NusaPOS Kasir</title>
+  <title>Kasir</title>
   <style>
-    :root { --navy: #1B365D; --tosca: #00B5B5; --bg: #0F2537; }
-    body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; }
-    .header { padding: 15px; border-bottom: 2px solid var(--tosca); display: flex; justify-content: space-between; }
-    .btn { background: var(--tosca); color: var(--bg); padding: 15px; border-radius: 10px; width: 100%; border: none; font-weight: bold; }
+    body { background: #0F2537; color: white; font-family: sans-serif; margin: 0; padding: 15px; }
+    .btn { background: #00B5B5; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="header"><h1>Kasir</h1> <a href="dashboard.html" style="color:var(--tosca)">← Menu</a></div>
-  <div style="padding: 15px;">
-    <select id="prod" style="width:100%; padding:10px; background:var(--navy); color:white;">
-      <option value="15000|Kopi Susu">Kopi Susu - Rp 15.000</option>
-    </select>
-    <button class="btn" onclick="tambah()" style="margin-top:10px;">TAMBAH</button>
-  </div>
-  <div id="cart" style="padding: 15px;"></div>
-  <button class="btn" style="position:fixed; bottom:10px; width:90%; left:5%;" onclick="checkout()">BAYAR</button>
+  <h1>Kasir</h1>
+  <select id="prod" style="width:100%; padding:10px; background:#1B365D; color:white;">
+    <option value="15000|Nasi Goreng">Nasi Goreng - Rp 15.000</option>
+    <option value="20000|Ayam Bakar">Ayam Bakar - Rp 20.000</option>
+  </select>
+  <button class="btn" onclick="tambah()">TAMBAH KE KERANJANG</button>
+  <div id="cart"></div>
+  <button class="btn" onclick="checkout()">BAYAR SEKARANG</button>
   
   <script src="app.js"></script>
   <script>
@@ -28,12 +24,12 @@
     function tambah() {
       const val = document.getElementById('prod').value.split('|');
       cart.push({nama: val[1], harga: parseInt(val[0])});
-      alert("Ditambahkan!");
+      alert(val[1] + " ditambahkan!");
     }
     async function checkout() {
       const total = cart.reduce((a, b) => a + b.harga, 0);
-      await window.saveTransaction({tanggal: new Date(), items: cart, total: total});
-      alert("Transaksi Sukses!");
+      await window.saveTransaction({tanggal: new Date().toISOString(), total: total});
+      alert("Transaksi Berhasil!");
       cart = [];
     }
   </script>
