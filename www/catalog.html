@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NusaPOS Mobile - Katalog</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,45 +20,45 @@
 </head>
 <body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
 
-  <!-- TOP BAR -->
-  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
+  <header class="bg-nusanavy border-b border-gray-800 pt-6 pb-4 px-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
-      <a href="dashboard.html" class="text-nusatosca font-bold text-sm bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
-        ⬅ Dashboard
+      <a href="dashboard.html" class="text-nusatosca font-bold text-xs bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
+        ⬅ Menu
       </a>
+      <img src="../icon.png" alt="Logo" class="w-7 h-7 object-contain">
+      <h1 class="text-sm font-bold tracking-wide">Katalog Barang</h1>
     </div>
-    <h1 class="text-md font-bold tracking-wide text-gray-300">Kelola Produk</h1>
+    <span id="clock" class="text-xs font-mono text-nusatosca font-bold bg-gray-900/40 px-2 py-1 rounded">00:00</span>
   </header>
 
-  <!-- MAIN AREA -->
-  <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
+  <main class="flex-1 overflow-y-auto p-4 space-y-5 pb-24">
     
-    <!-- Form Tambah Produk -->
     <div class="bg-gray-900/60 backdrop-blur p-4 rounded-xl border border-gray-800 space-y-3 shadow-lg">
-      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">Tambah Produk Baru</h3>
-      <div class="grid grid-cols-2 gap-3">
-        <input type="text" id="prod-name" placeholder="Nama Produk" class="col-span-2 bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-        <input type="number" id="prod-price" placeholder="Harga Jual (Rp)" class="bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-        <input type="number" id="prod-stock" placeholder="Stok Awal" class="bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">➕ Tambah Produk Baru</h3>
+      
+      <div class="space-y-2">
+        <div>
+          <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Nama Barang</label>
+          <input type="text" id="prod-name" placeholder="Contoh: Kopi Hitam" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+        </div>
+        <div>
+          <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Harga Jual (Rp)</label>
+          <input type="number" id="prod-price" placeholder="Contoh: 15000" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+        </div>
+        <button onclick="saveProduct()" class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
+          Simpan ke Katalog
+        </button>
       </div>
-      <button class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
-        + Simpan ke Katalog
-      </button>
     </div>
 
-    <!-- Daftar Produk -->
-    <div class="bg-gray-900/40 rounded-xl border border-gray-800 overflow-hidden shadow-lg">
-      <div class="bg-gray-900/80 p-3 border-b border-gray-800">
-        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Daftar Katalog Aktif</span>
-      </div>
-      <div class="p-3 divide-y divide-gray-800" id="catalog-list">
-        <!-- Contoh data terisi -->
-      </div>
+    <div class="space-y-2">
+      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Daftar Produk Aktif</h3>
+      <div id="catalog-list" class="bg-gray-900/40 rounded-xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
+        </div>
     </div>
 
   </main>
 
-  <!-- FOOTER NAVIGATION (Diselaraskan dengan Dashboard & Setting) -->
   <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
     <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
       <span class="text-xl">📊</span>
@@ -71,5 +70,99 @@
     </a>
   </footer>
 
+  <script>
+    // Data bawaan awal jika database kosong
+    const defaultProducts = [
+      { id: 'p1', name: 'Kopi Susu Aren', price: 22000 },
+      { id: 'p2', name: 'Roti Bakar Cokelat', price: 15000 },
+      { id: 'p3', name: 'Es Teh Manis Jumbo', price: 7000 },
+      { id: 'p4', name: 'Kentang Goreng Krispi', price: 18000 }
+    ];
+
+    // Fungsi menyimpan produk baru
+    function saveProduct() {
+      const nameInput = document.getElementById('prod-name');
+      const priceInput = document.getElementById('prod-price');
+
+      if (!nameInput.value.trim() || !priceInput.value) {
+        alert('Nama barang dan harga harus diisi!');
+        return;
+      }
+
+      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
+      if (!catalog || catalog.length === 0) {
+        catalog = [...defaultProducts];
+      }
+
+      // Masukkan item baru ke dalam database array
+      catalog.push({
+        id: 'p_' + Date.now(),
+        name: nameInput.value.trim(),
+        price: parseInt(priceInput.value)
+      });
+
+      localStorage.setItem('catalog_products', JSON.stringify(catalog));
+      
+      // Reset input form
+      nameInput.value = '';
+      priceInput.value = '';
+      
+      renderCatalog();
+    }
+
+    // Fungsi menghapus produk dari daftar
+    window.deleteProduct = function(prodId) {
+      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
+      if (!catalog || catalog.length === 0) {
+        catalog = [...defaultProducts];
+      }
+      
+      catalog = catalog.filter(p => p.id !== prodId);
+      localStorage.setItem('catalog_products', JSON.stringify(catalog));
+      renderCatalog();
+    }
+
+    // Fungsi menampilkan daftar barang ke layar HP
+    function renderCatalog() {
+      const container = document.getElementById('catalog-list');
+      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
+      
+      // Jika pertama kali buka dan kosong, inisialisasi dengan data default
+      if (!catalog) {
+        catalog = [...defaultProducts];
+        localStorage.setItem('catalog_products', JSON.stringify(catalog));
+      }
+
+      if (catalog.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-500 text-xs py-6">Katalog kosong. Silakan tambah barang.</p>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      catalog.forEach(product => {
+        const div = document.createElement('div');
+        div.className = "p-4 flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <h4 class="text-xs font-bold text-gray-200">${product.name}</h4>
+            <p class="text-[10px] text-nusatosca font-medium">Rp ${product.price.toLocaleString('id-ID')}</p>
+          </div>
+          <button onclick="deleteProduct('${product.product_id || product.id}')" class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded-lg active:scale-95 transition">
+            Hapus
+          </button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderCatalog();
+    });
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }, 1000);
+  </script>
 </body>
 </html>
