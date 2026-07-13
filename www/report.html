@@ -4,45 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NusaPOS Mobile - Rek Koran</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { theme: { extend: { colors: { nusanavy: '#0F2537', nusatosca: '#14B3B5' } } } }
-  </script>
+  <style>
+    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 80px; }
+    .header { display:flex; justify-content:space-between; align-items:center; padding: 15px; border-bottom: 1px solid #2a3e4d; }
+    .card { background: #1a2e3d; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #2a3e4d; }
+    .tosca { color: #14B3B5; }
+    .select { background: #0a141c; color:#14B3B5; border:1px solid #2a3e4d; padding:8px; border-radius:8px; font-size:12px }
+    .btn-tosca { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; margin:15px }
+    .trx-item { background: #1a2e3d; padding: 12px; border-radius: 12px; margin: 10px 15px; border: 1px solid #2a3e4d; display:flex; justify-content:space-between; }
+    .footer { position: fixed; bottom: 0; width: 100%; background: #0a141c; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #2a3e4d; }
+    .footer a { color: #888; text-decoration: none; text-align: center; font-size: 12px; }
+    .footer .active { color: #14B3B5; }
+  </style>
 </head>
-<body class="bg-nusanavy font-sans h-screen flex-col text-white">
+<body>
 
-  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center">
-    <h1 class="text-sm font-bold">Rek Koran Transaksi</h1>
-    <select id="pilih-bulan" onchange="loadReport()" class="bg-gray-900 text-xs p-2 rounded text-nusatosca">
-    </select>
-  </header>
+  <div class="header">
+    <h1 style="font-size:16px; margin:0;">Rek Koran Transaksi</h1>
+    <select id="pilih-bulan" onchange="loadReport()" class="select"></select>
+  </div>
 
-  <main class="flex-1 overflow-y-auto p-5 pb-24">
-    <div class="bg-gray-900/50 p-4 rounded-2xl mb-4 flex justify-between">
-      <div>
-        <p class="text- text-gray-400">Total Transaksi</p>
-        <p id="total-trx" class="text-xl font-bold">0</p>
-      </div>
-      <div class="text-right">
-        <p class="text- text-gray-400">Total Omset</p>
-        <p id="total-omset" class="text-xl font-bold text-nusatosca">Rp 0</p>
-      </div>
+  <div class="card" style="display:flex; justify-content:space-between;">
+    <div>
+      <small style="color:#aaa">Total Transaksi</small><br>
+      <b id="total-trx" style="font-size:20px">0</b>
     </div>
-
-    <div id="list-transaksi" class="space-y-3">
-      <p class="text-center text-gray-500 text-sm py-8">Pilih bulan untuk melihat data</p>
+    <div style="text-align:right;">
+      <small style="color:#aaa">Total Omset</small><br>
+      <b id="total-omset" class="tosca" style="font-size:20px">Rp 0</b>
     </div>
+  </div>
 
-    <button onclick="exportBulanIni()" class="w-full mt-4 bg-nusatosca text-nusanavy font-bold py-3 rounded-xl">
-      Export Bulan Ini ke .JSON
-    </button>
-  </main>
+  <div id="list-transaksi">
+    <p style="text-align:center; color:#888; padding:30px 0">Pilih bulan untuk melihat data</p>
+  </div>
 
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 border-t border-gray-900 p-3 flex justify-around">
-    <a href="dashboard.html" class="text-gray-500">📊<br><span>Dashboard</span></a>
-    <a href="report.html" class="text-nusatosca">📄<br><span>Rek Koran</span></a>
-    <a href="setting.html" class="text-gray-500">⚙️<br><span>Settings</span></a>
-  </footer>
+  <button onclick="exportBulanIni()" class="btn-tosca">
+    Export Bulan Ini ke .JSON
+  </button>
+
+  <div class="footer">
+    <a href="dashboard.html">📊<br>Dashboard</a>
+    <a href="report.html" class="active">📄<br>Rek Koran</a>
+    <a href="setting.html">⚙️<br>Settings</a>
+  </div>
 
   <script>
     let db;
@@ -53,7 +58,7 @@
       request.onsuccess = (e) => { 
         db = e.target.result; 
         isiDropdownBulan();
-        loadReport(); // load bulan ini otomatis
+        loadReport();
       };
     });
 
@@ -66,7 +71,7 @@
     function isiDropdownBulan() {
       const select = document.getElementById('pilih-bulan');
       const sekarang = new Date();
-      for(let i = 0; i < 6; i++) { // 6 bulan kebelakang
+      for(let i = 0; i < 6; i++) {
         const d = new Date(sekarang.getFullYear(), sekarang.getMonth() - i, 1);
         const bulan = d.getMonth() + 1;
         const tahun = d.getFullYear();
@@ -93,21 +98,21 @@
       const list = document.getElementById('list-transaksi');
       list.innerHTML = '';
       if(dataBulanTerpilih.length === 0) {
-        list.innerHTML = `<p class="text-center text-gray-500">Tidak ada transaksi di bulan ini</p>`;
+        list.innerHTML = `<p style="text-align:center; color:#888; padding:30px 0">Tidak ada transaksi di bulan ini</p>`;
         return;
       }
 
-      dataBulanTerpilih.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)); // terbaru di atas
+      dataBulanTerpilih.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
       dataBulanTerpilih.forEach(t => {
         const tgl = new Date(t.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
         const item = document.createElement('div');
-        item.className = "bg-gray-900/40 p-3 rounded-xl flex justify-between";
+        item.className = "trx-item";
         item.innerHTML = `
           <div>
-            <p class="text-xs text-gray-400">${tgl}</p>
-            <p class="text-xs">${t.items.length} Item</p>
+            <p style="font-size:11px; color:#aaa; margin:0">${tgl}</p>
+            <p style="font-size:12px; margin:4px 0 0 0">${t.items.length} Item</p>
           </div>
-          <p class="font-bold text-nusatosca">Rp ${t.total.toLocaleString('id-ID')}</p>
+          <p class="tosca" style="font-weight:bold; margin:0">Rp ${t.total.toLocaleString('id-ID')}</p>
         `;
         list.appendChild(item);
       });
