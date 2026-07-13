@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NusaPOS Mobile - Dashboard</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,7 +20,6 @@
 </head>
 <body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
 
-  <!-- TOP BAR OWNER -->
   <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
       <img src="../icon.png" alt="Logo" class="w-8 h-8 object-contain">
@@ -33,10 +31,8 @@
     <span id="clock" class="text-xs font-mono text-nusatosca font-bold bg-gray-900/40 px-2 py-1 rounded">00:00</span>
   </header>
 
-  <!-- MAIN DASHBOARD CONTENT -->
   <main class="flex-1 overflow-y-auto p-5 space-y-6">
     
-    <!-- Ringkasan Singkat Toko (Metrik Ringan) -->
     <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800 flex justify-between items-center shadow-lg">
       <div>
         <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Omset Hari Ini</span>
@@ -48,33 +44,29 @@
       </div>
     </div>
 
-    <!-- PENGATURAN HALAMAN AKTIF (MODUL UTAMA) -->
     <div class="space-y-3">
       <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Akses Halaman Toko</h3>
       
-      <!-- Grid Menu yang Bisa Diakses Owner / Kasir -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-4" id="menu-container">
         
-        <!-- Tombol Menu 1: Mesin Kasir -->
-        <a href="index.html" class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800 active:scale-95 transition flex flex-col items-center justify-center space-y-2 text-center shadow-md">
+        <a href="index.html" id="menu-kasir" class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800 active:scale-95 transition flex flex-col items-center justify-center space-y-2 text-center shadow-md">
           <span class="text-3xl">🛒</span>
           <span class="text-xs font-bold text-gray-200 tracking-wide">Mesin Kasir</span>
           <span class="text-[9px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full font-bold">Aktif</span>
         </a>
 
-        <!-- Tombol Menu 2: Kelola Katalog -->
-        <a href="catalog.html" class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800 active:scale-95 transition flex flex-col items-center justify-center space-y-2 text-center shadow-md">
+        <a href="catalog.html" id="menu-katalog" class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800 active:scale-95 transition flex flex-col items-center justify-center space-y-2 text-center shadow-md">
           <span class="text-3xl">📦</span>
           <span class="text-xs font-bold text-gray-200 tracking-wide">Katalog Barang</span>
           <span class="text-[9px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full font-bold">Aktif</span>
         </a>
 
       </div>
+      <p id="empty-message" class="text-center text-gray-500 text-xs py-8 hidden">Tidak ada modul aktif. Silakan aktifkan di Settings.</p>
     </div>
 
   </main>
 
-  <!-- FOOTER NAVIGATION UTAMA -->
   <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
     <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-nusatosca">
       <span class="text-xl">📊</span>
@@ -87,6 +79,22 @@
   </footer>
 
   <script>
+    // Sinkronisasi Tampilan Menu Berdasarkan State Settings
+    document.addEventListener("DOMContentLoaded", () => {
+      const kasirVisible = localStorage.getItem('modul_kasir') !== 'false';
+      const katalogVisible = localStorage.getItem('modul_katalog') !== 'false';
+      
+      const elKasir = document.getElementById('menu-kasir');
+      const elKatalog = document.getElementById('menu-katalog');
+      
+      if (!kasirVisible) elKasir.style.display = 'none';
+      if (!katalogVisible) elKatalog.style.display = 'none';
+      
+      if (!kasirVisible && !katalogVisible) {
+        document.getElementById('empty-message').classList.remove('hidden');
+      }
+    });
+
     setInterval(() => {
       const now = new Date();
       document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
