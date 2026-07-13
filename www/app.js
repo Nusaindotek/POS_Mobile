@@ -1,9 +1,16 @@
-// app.js - Fungsi untuk semua halaman
-function simpanData(key, data) {
+// app.js - Logika Terpusat
+
+// Fungsi untuk menyimpan pengaturan toko
+function simpanKeLocalStorage(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
-    alert('Data berhasil disimpan!');
+    alert('Data berhasil disimpan ke penyimpanan perangkat!');
 }
 
-function ambilData(key) {
-    return JSON.parse(localStorage.getItem(key));
+// Fungsi untuk mengambil data
+function ambilDariLocalStorage(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
 }
+
+// Fungsi navigasi (bisa ditambah fungsi lain nanti)
+console.log("Sistem Kasir Siap");
