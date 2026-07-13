@@ -2,175 +2,49 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NusaPOS Mobile - Settings</title>
+  <title>Settings</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            nusanavy: '#0F2537',
-            nusatosca: '#14B3B5',
-          }
-        }
-      }
-    }
-  </script>
 </head>
-<body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
+<body class="bg-[#0F2537] text-white p-6">
+  <h1 class="font-bold text-lg mb-4">Pengaturan Modul</h1>
+  
+  <div class="bg-gray-900 p-4 rounded-xl mb-6">
+    <input type="text" id="name" placeholder="Nama Menu" class="w-full bg-black p-2 rounded mb-2 text-sm">
+    <input type="text" id="icon" placeholder="Emoji (contoh: 📊)" class="w-full bg-black p-2 rounded mb-2 text-sm">
+    <button onclick="addPage()" class="w-full bg-[#14B3B5] p-2 rounded font-bold">TAMBAH MENU</button>
+  </div>
 
-  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
-    <div class="flex items-center space-x-3">
-      <a href="dashboard.html" class="text-nusatosca font-bold text-sm bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800">
-        ⬅ Dashboard
-      </a>
-    </div>
-    <h1 class="text-md font-bold tracking-wide text-gray-300">Pengaturan Modul</h1>
-  </header>
-
-  <main class="flex-1 overflow-y-auto p-5 space-y-6 pb-24">
-    <div class="space-y-1">
-      <h2 class="text-sm font-bold text-nusatosca uppercase tracking-wider">Fitur & Halaman</h2>
-      <p class="text-xs text-gray-400">Aktifkan atau tambah halaman modul baru untuk operasional tokomu.</p>
-    </div>
-
-    <div class="bg-gray-900/40 rounded-2xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
-      <div class="p-4 flex justify-between items-center">
-        <div>
-          <h4 class="text-sm font-semibold text-gray-200">🛒 Modul Transaksi Kasir</h4>
-          <p class="text-[11px] text-gray-500">Membuka fitur penjualan utama.</p>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" id="toggle-kasir" class="sr-only peer" onchange="saveSettings()">
-          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
-        </label>
-      </div>
-
-      <div class="p-4 flex justify-between items-center">
-        <div>
-          <h4 class="text-sm font-semibold text-gray-200">📦 Modul Katalog & Stok</h4>
-          <p class="text-[11px] text-gray-500">Mengelola data master barang jualan.</p>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" id="toggle-katalog" class="sr-only peer" onchange="saveSettings()">
-          <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusatosca peer-checked:after:bg-nusanavy"></div>
-        </label>
-      </div>
-    </div>
-
-    <div class="bg-gray-900/60 backdrop-blur p-4 rounded-2xl border border-gray-800 space-y-4 shadow-lg">
-      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">➕ Tambah Modul Halaman Baru</h3>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="text-[11px] text-gray-400 font-bold uppercase block mb-1">Nama Halaman/Menu</label>
-          <input type="text" id="custom-page-name" placeholder="Contoh: Laporan Keuangan, Absensi Kasir" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-        </div>
-        <div>
-          <label class="text-[11px] text-gray-400 font-bold uppercase block mb-1">Pilih Ikon Emoji</label>
-          <select id="custom-page-icon" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-            <option value="📊">📊 Laporan Grafik</option>
-            <option value="👥">👥 Manajemen Karyawan</option>
-            <option value="💸">💸 Biaya Operasional</option>
-            <option value="🔑">🔑 Akses Owner</option>
-          </select>
-        </div>
-        <button onclick="addCustomPage()" class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
-          Simpan Menu Halaman
-        </button>
-      </div>
-    </div>
-
-    <div class="space-y-2">
-      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Halaman Kustom Milikmu</h3>
-      <div id="custom-pages-list" class="bg-gray-900/40 rounded-2xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
-        </div>
-    </div>
-
-  </main>
-
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
-    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
-      <span class="text-xl">📊</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
-    </a>
-    <a href="setting.html" class="flex flex-col items-center space-y-1 text-nusatosca">
-      <span class="text-xl">⚙️</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Settings</span>
-    </a>
-  </footer>
+  <div id="list" class="space-y-2"></div>
 
   <script>
-    function saveSettings() {
-      const kasirActive = document.getElementById('toggle-kasir').checked;
-      const katalogActive = document.getElementById('toggle-katalog').checked;
-      localStorage.setItem('modul_kasir', kasirActive);
-      localStorage.setItem('modul_katalog', katalogActive);
+    function render() {
+      const list = document.getElementById('list');
+      const pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      list.innerHTML = pages.map(p => `
+        <div class="flex justify-between items-center bg-gray-800 p-3 rounded">
+          <span>${p.icon} ${p.name}</span>
+          <button onclick="del('${p.id}')" class="text-red-400 text-xs">Hapus</button>
+        </div>
+      `).join('');
     }
 
-    // Fungsi Tambah Halaman Kustom Baru
-    function addCustomPage() {
-      const nameInput = document.getElementById('custom-page-name');
-      const iconInput = document.getElementById('custom-page-icon');
-      
-      if (!nameInput.value.trim()) {
-        alert('Nama halaman tidak boleh kosong!');
-        return;
-      }
-
-      let customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
-      
-      // Simpan data halaman baru
-      customPages.push({
-        id: 'page_' + Date.now(),
-        name: nameInput.value.trim(),
-        icon: iconInput.value,
-        url: '#' // Nanti bisa diarahkan ke file HTML kustom baru
-      });
-
-      localStorage.setItem('custom_pages', JSON.stringify(customPages));
-      nameInput.value = ''; // Reset form
-      renderCustomPages();
+    function addPage() {
+      const name = document.getElementById('name').value;
+      const icon = document.getElementById('icon').value;
+      if(!name) return;
+      const pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      pages.push({id: Date.now().toString(), name, icon});
+      localStorage.setItem('custom_pages', JSON.stringify(pages));
+      render();
     }
 
-    // Fungsi Hapus Halaman Kustom
-    window.deletePage = function(pageId) {
-      let customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
-      customPages = customPages.filter(p => p.id !== pageId);
-      localStorage.setItem('custom_pages', JSON.stringify(customPages));
-      renderCustomPages();
+    function del(id) {
+      let pages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      pages = pages.filter(p => p.id !== id);
+      localStorage.setItem('custom_pages', JSON.stringify(pages));
+      render();
     }
-
-    // Tampilkan daftar halaman kustom di setting
-    function renderCustomPages() {
-      const container = document.getElementById('custom-pages-list');
-      const customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
-      
-      if (customPages.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 text-xs py-4">Belum ada halaman kustom</p>`;
-        return;
-      }
-
-      container.innerHTML = '';
-      customPages.forEach(page => {
-        const row = document.createElement('div');
-        row.className = 'p-4 flex justify-between items-center';
-        row.innerHTML = `
-          <div>
-            <h4 class="text-sm font-semibold text-gray-200">${page.icon} ${page.name}</h4>
-          </div>
-          <button onclick="deletePage('${page.id}')" class="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded-lg">Hapus</button>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById('toggle-kasir').checked = localStorage.getItem('modul_kasir') !== 'false';
-      document.getElementById('toggle-katalog').checked = localStorage.getItem('modul_katalog') !== 'false';
-      renderCustomPages();
-    });
+    render();
   </script>
 </body>
 </html>
