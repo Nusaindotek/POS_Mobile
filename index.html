@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NusaPOS Mobile Beta</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            // Penguncian warna presisi sesuai LOGO BARU
-            nusanavy: '#0F2537',  /* Sisi kiri logo (Navy Pekat) */
-            nusatosca: '#14B3B5', /* Sisi kanan logo (Tosca Cerah) */
+            nusanavy: '#0F2537',
+            nusatosca: '#14B3B5',
           }
         }
       }
@@ -21,16 +21,23 @@
 </head>
 <body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
 
+  <!-- TOP BAR / HEADER -->
   <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
-      <img src="icon.png" alt="Logo" class="w-8 h-8 object-contain">
-      <h1 class="text-md font-bold tracking-wide">NusaPOS <span class="text-[10px] bg-nusatosca text-nusanavy px-2 py-0.5 rounded-full font-bold ml-1">MOBILE</span></h1>
+      <!-- Tombol Kembali ke Dashboard -->
+      <a href="dashboard.html" class="text-nusatosca font-bold text-xs bg-gray-900/60 px-2.5 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
+        ⬅ Menu
+      </a>
+      <img src="icon.png" alt="Logo" class="w-7 h-7 object-contain">
+      <h1 class="text-sm font-bold tracking-wide">NusaPOS</h1>
     </div>
     <span id="clock" class="text-xs font-mono text-nusatosca font-bold bg-gray-900/40 px-2 py-1 rounded">00:00</span>
   </header>
 
+  <!-- MAIN AREA (SCAN & KERANJANG) -->
   <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
     
+    <!-- Kolom Cari / Scan -->
     <div class="bg-gray-900/60 backdrop-blur p-3 rounded-xl border border-gray-800 flex space-x-2 shadow-inner">
       <input type="text" placeholder="Cari nama barang / scan barcode..." class="flex-1 bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white placeholder-gray-500">
       <button class="bg-nusatosca text-nusanavy px-4 rounded-lg text-sm font-bold shadow-md hover:bg-teal-400 active:scale-95 transition">
@@ -38,6 +45,7 @@
       </button>
     </div>
 
+    <!-- Ringkasan Item di Keranjang -->
     <div class="bg-gray-900/40 rounded-xl border border-gray-800 overflow-hidden shadow-lg">
       <div class="bg-gray-900/80 p-3 border-b border-gray-800 flex justify-between items-center">
         <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Item di Keranjang</span>
@@ -45,22 +53,17 @@
       </div>
       
       <div class="p-3 divide-y divide-gray-800" id="cart-list">
-        <div class="py-2.5 flex justify-between items-center">
-          <div>
-            <h4 class="text-sm font-medium text-gray-200">Kopi Susu Nusa</h4>
-            <span class="text-xs text-gray-500">1 x Rp 18.000</span>
-          </div>
-          <span class="text-sm font-bold text-nusatosca">Rp 18.000</span>
-        </div>
+        <!-- Render via JS -->
       </div>
     </div>
 
   </main>
 
+  <!-- BOTTOM CHECKOUT BAR -->
   <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-4 shadow-2xl flex items-center justify-between z-50">
     <div>
       <span class="text-[10px] text-gray-500 block font-bold uppercase tracking-wider">Total Tagihan</span>
-      <span class="text-xl font-black text-white tracking-tight" id="grand-total">Rp 18.000</span>
+      <span class="text-xl font-black text-white tracking-tight" id="grand-total">Rp 0</span>
     </div>
     <button class="bg-nusatosca hover:bg-teal-400 active:scale-95 text-nusanavy font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-nusatosca/20 transition duration-150 text-sm tracking-wider uppercase">
       Bayar Sekarang
