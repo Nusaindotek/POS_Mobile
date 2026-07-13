@@ -2,32 +2,25 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Rek Koran</title>
+  <title>Laporan</title>
   <style>
-    body { background: #0F2537; color: white; font-family: sans-serif; }
-    .card { background: #1a2e3d; padding: 15px; margin: 10px; border-radius: 12px; }
+    body { background: #0F2537; color: white; padding: 15px; font-family: sans-serif; }
+    .item { background: #1B365D; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
-  <h1>Rek Koran Transaksi</h1>
-  <div id="list-transaksi">Memuat data...</div>
-
+  <h1>Laporan Transaksi</h1>
+  <div id="list">Memuat...</div>
   <script src="app.js"></script>
   <script>
     window.addEventListener('db-ready', async () => {
-      const listDiv = document.getElementById('list-transaksi');
-      const transaksi = await window.getAllData('transaksi');
-      
-      if (transaksi.length === 0) {
-        listDiv.innerHTML = "<p>Tidak ada transaksi.</p>";
-      } else {
-        listDiv.innerHTML = transaksi.map(t => `
-          <div class="card">
-            <p>Tanggal: ${new Date(t.tanggal).toLocaleDateString()}</p>
-            <p>Total: <b>Rp ${t.total.toLocaleString()}</b></p>
-          </div>
-        `).join('');
-      }
+      const data = await window.getAllData('transaksi');
+      const list = document.getElementById('list');
+      list.innerHTML = data.map(d => `
+        <div class="item">
+          ${new Date(d.tanggal).toLocaleDateString()} - <b>Rp ${d.total.toLocaleString()}</b>
+        </div>
+      `).join('');
     });
   </script>
 </body>
