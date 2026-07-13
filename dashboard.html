@@ -4,29 +4,56 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
 <style>
-body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:20px}
-.card{background:#1a2e3d; padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid #2a3e4d}
+body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{padding:15px; display:flex; align-items:center; gap:10px}
+.header img{width:40px; height:40px; border-radius:8px}
 .tosca{color:#14B3B5}
-a{color:#14B3B5; text-decoration:none}
+.card{background:#1a2e3d; margin:12px; padding:16px; border-radius:12px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.btn-akses{background:#1a2e3d; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:white}
+.badge{background:green; padding:4px 8px; border-radius:20px; font-size:11px}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+.bottom-nav a.active{color:#14B3B5; font-weight:bold}
 </style>
 </head>
 <body>
-  <h2>Dashboard</h2>
-  <div class="card">
-    <h3>Penjualan Hari Ini</h3>
-    <h1 class="tosca" id="total-hari-ini">Rp 0</h1>
+  <div class="header">
+    <img src="logo.png" alt="logo">
+    <div>
+      <div style="font-weight:bold">NusaPOS Owner</div>
+      <div class="tosca" style="font-size:12px">Status: Premium Beta</div>
+    </div>
   </div>
+
   <div class="card">
-    <h3>Transaksi Terakhir</h3>
-    <p id="last-transaksi">Belum ada transaksi</p>
+    <div style="display:flex; justify-content:space-between">
+      <div><small>OMSET HARI INI</small><h2 class="tosca" id="omset">Rp 0</h2></div>
+      <div><small>TRANSAKSI</small><h2 id="transaksi">0</h2></div>
+    </div>
   </div>
-  <a href="index.html">← Kembali ke Menu</a>
+
+  <div class="card">
+    <h3>STATISTIK JUALAN (7 HARI TERAKHIR)</h3>
+    <p style="color:#888">Grafik akan muncul setelah ada transaksi</p>
+  </div>
+
+  <div style="padding:0 12px"><small>AKSES HALAMAN TOKO</small></div>
+  <div class="grid2" style="padding:12px">
+    <a href="catalog.html" class="btn-akses">🛒<br><b>Mesin Kasir</b><br><span class="badge">Aktif</span></a>
+    <a href="#" class="btn-akses">📦<br><b>Katalog Barang</b><br><span class="badge">Aktif</span></a>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="active">📊<br>DASHBOARD</a>
+    <a href="setting.html">⚙️<br>SETTINGS</a>
+  </div>
   <script>
     const last = localStorage.getItem('lastTransaksi');
     if(last){
       const data = JSON.parse(last);
-      document.getElementById('total-hari-ini').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
-      document.getElementById('last-transaksi').innerText = `Rp ${data.total.toLocaleString('id-ID')} - ${new Date(data.tanggal).toLocaleTimeString('id-ID')}`;
+      document.getElementById('omset').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
+      document.getElementById('transaksi').innerText = `1`;
     }
   </script>
 </body>
