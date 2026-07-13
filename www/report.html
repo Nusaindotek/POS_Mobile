@@ -2,135 +2,25 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NusaPOS Mobile - Rek Koran</title>
+  <title>Laporan</title>
   <style>
-    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 80px; }
-    .header { display:flex; justify-content:space-between; align-items:center; padding: 15px; border-bottom: 1px solid #2a3e4d; }
-    .card { background: #1a2e3d; padding: 16px; border-radius: 16px; margin: 15px; border: 1px solid #2a3e4d; }
-    .tosca { color: #14B3B5; }
-    .select { background: #0a141c; color:#14B3B5; border:1px solid #2a3e4d; padding:8px; border-radius:8px; font-size:12px }
-    .btn-tosca { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; margin:15px }
-    .trx-item { background: #1a2e3d; padding: 12px; border-radius: 12px; margin: 10px 15px; border: 1px solid #2a3e4d; display:flex; justify-content:space-between; }
-    .footer { position: fixed; bottom: 0; width: 100%; background: #0a141c; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #2a3e4d; }
-    .footer a { color: #888; text-decoration: none; text-align: center; font-size: 12px; }
-    .footer .active { color: #14B3B5; }
+    :root { --navy: #1B365D; --tosca: #00B5B5; --bg: #0F2537; }
+    body { background: var(--bg); color: white; font-family: sans-serif; }
+    .item { background: var(--navy); padding: 15px; margin: 10px; border-radius: 10px; display:flex; justify-content:space-between; }
   </style>
 </head>
 <body>
-
-  <div class="header">
-    <h1 style="font-size:16px; margin:0;">Rek Koran Transaksi</h1>
-    <select id="pilih-bulan" onchange="loadReport()" class="select"></select>
-  </div>
-
-  <div class="card" style="display:flex; justify-content:space-between;">
-    <div>
-      <small style="color:#aaa">Total Transaksi</small><br>
-      <b id="total-trx" style="font-size:20px">0</b>
-    </div>
-    <div style="text-align:right;">
-      <small style="color:#aaa">Total Omset</small><br>
-      <b id="total-omset" class="tosca" style="font-size:20px">Rp 0</b>
-    </div>
-  </div>
-
-  <div id="list-transaksi">
-    <p style="text-align:center; color:#888; padding:30px 0">Pilih bulan untuk melihat data</p>
-  </div>
-
-  <button onclick="exportBulanIni()" class="btn-tosca">
-    Export Bulan Ini ke .JSON
-  </button>
-
-  <div class="footer">
-    <a href="dashboard.html">📊<br>Dashboard</a>
-    <a href="report.html" class="active">📄<br>Rek Koran</a>
-    <a href="setting.html">⚙️<br>Settings</a>
-  </div>
-
+  <div style="padding:15px"><h1>Laporan</h1></div>
+  <div id="list"></div>
+  <script src="app.js"></script>
   <script>
-    let db;
-    let dataBulanTerpilih = [];
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const request = indexedDB.open("NUSAPOS_DB", 1);
-      request.onsuccess = (e) => { 
-        db = e.target.result; 
-        isiDropdownBulan();
-        loadReport();
-      };
-    });
-
-    async function getAllData(storeName) {
-        return new Promise((resolve) => {
-            db.transaction(storeName, "readonly").objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
-        });
-    }
-
-    function isiDropdownBulan() {
-      const select = document.getElementById('pilih-bulan');
-      const sekarang = new Date();
-      for(let i = 0; i < 6; i++) {
-        const d = new Date(sekarang.getFullYear(), sekarang.getMonth() - i, 1);
-        const bulan = d.getMonth() + 1;
-        const tahun = d.getFullYear();
-        const option = document.createElement('option');
-        option.value = `${bulan}-${tahun}`;
-        option.text = d.toLocaleDateString('id-ID', {month: 'long', year: 'numeric'});
-        select.appendChild(option);
-      }
-    }
-
-    async function loadReport() {
-      const transaksi = await getAllData('transaksi');
-      const [bulan, tahun] = document.getElementById('pilih-bulan').value.split('-');
-      
-      dataBulanTerpilih = transaksi.filter(t => {
-          const tgl = new Date(t.tanggal);
-          return tgl.getMonth() + 1 == bulan && tgl.getFullYear() == tahun;
+    window.onload = async () => {
+      const data = await window.getAllData('transaksi');
+      const list = document.getElementById('list');
+      data.forEach(d => {
+        list.innerHTML += `<div class="item"><span>${new Date(d.tanggal).toLocaleDateString()}</span><b>Rp ${d.total}</b></div>`;
       });
-
-      const totalOmset = dataBulanTerpilih.reduce((sum, t) => sum + t.total, 0);
-      document.getElementById('total-trx').innerText = dataBulanTerpilih.length;
-      document.getElementById('total-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
-
-      const list = document.getElementById('list-transaksi');
-      list.innerHTML = '';
-      if(dataBulanTerpilih.length === 0) {
-        list.innerHTML = `<p style="text-align:center; color:#888; padding:30px 0">Tidak ada transaksi di bulan ini</p>`;
-        return;
-      }
-
-      dataBulanTerpilih.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
-      dataBulanTerpilih.forEach(t => {
-        const tgl = new Date(t.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        const item = document.createElement('div');
-        item.className = "trx-item";
-        item.innerHTML = `
-          <div>
-            <p style="font-size:11px; color:#aaa; margin:0">${tgl}</p>
-            <p style="font-size:12px; margin:4px 0 0 0">${t.items.length} Item</p>
-          </div>
-          <p class="tosca" style="font-weight:bold; margin:0">Rp ${t.total.toLocaleString('id-ID')}</p>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    async function exportBulanIni() {
-      const [bulan, tahun] = document.getElementById('pilih-bulan').value.split('-');
-      const dataBackup = { nama_toko: "NUSAPOS", periode: `${bulan}-${tahun}`, data_transaksi: dataBulanTerpilih };
-      const namaFile = `RekKoran_NUSAPOS_${bulan}-${tahun}.json`;
-      const blob = new Blob([JSON.stringify(dataBackup, null, 2)], {type: "application/json"});
-      try {
-          const handle = await window.showSaveFilePicker({ suggestedName: namaFile });
-          const writable = await handle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          alert(`Export ${namaFile} Berhasil!`);
-      } catch(err) {}
-    }
+    };
   </script>
 </body>
 </html>
