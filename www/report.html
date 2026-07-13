@@ -2,34 +2,22 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Laporan Bulanan</title>
+  <title>Laporan</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-nusanavy text-white p-6">
-  <h1 class="text-xl font-bold mb-4">Rekap Bulanan</h1>
-  <div id="report-container" class="bg-gray-800 p-4 rounded-lg">
-    <p>Menghitung data transaksi...</p>
-  </div>
-  <button onclick="generatePDF()" class="mt-4 w-full bg-nusatosca p-3 rounded-lg font-bold">
-    Simpan Laporan PDF
-  </button>
-  <a href="dashboard.html" class="block text-center mt-4 text-gray-400">Kembali ke Dashboard</a>
+<body class="bg-[#0F2537] text-white p-6">
+  <h1 class="text-xl font-bold mb-4">Rekap Transaksi</h1>
+  <div id="report" class="bg-gray-800 p-4 rounded-xl shadow-lg"></div>
+  <button onclick="window.print()" class="mt-4 w-full bg-[#14B3B5] p-3 rounded font-bold">CETAK/SIMPAN PDF</button>
 
   <script>
-    // 1. Ambil data transaksi dari memori HP
     const history = JSON.parse(localStorage.getItem('transaction_history') || '[]');
-    
-    // 2. Tampilkan ringkasan singkat
     const total = history.reduce((sum, t) => sum + t.total, 0);
-    document.getElementById('report-container').innerHTML = `
-      <p>Total Transaksi: ${history.length}</p>
-      <p class="text-2xl font-black text-nusatosca">Omset: Rp ${total.toLocaleString()}</p>
+    
+    document.getElementById('report').innerHTML = `
+      <div class="text-sm">Total Transaksi: ${history.length}</div>
+      <div class="text-3xl font-black text-[#14B3B5]">Rp ${total.toLocaleString()}</div>
     `;
-
-    // 3. Fungsi ini akan kita kembangkan untuk cetak PDF
-    function generatePDF() {
-      alert("Fitur simpan PDF sedang disiapkan! Data omset kamu: Rp " + total.toLocaleString());
-    }
   </script>
 </body>
 </html>
