@@ -15,9 +15,7 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 .keranjang{position:fixed; bottom:50px; left:0; width:100%; background:#0a141c; padding:10px 12px; border-top:1px solid #2a3e4d; box-sizing:border-box}
 .keranjang-item{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin:6px 0}
 .qty-btn{background:#2a3e4d; color:white; border:none; width:24px; height:24px; border-radius:6px; font-weight:bold}
-.btn-row{display:flex; gap:8px}
-.btn-simpan{background:#14B3B5; color:#0F2537; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; font-size:15px; margin-top:8px}
-.btn-cetak{background:#2a3e4d; color:white; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; font-size:15px; margin-top:8px}
+.btn-simpan-cetak{background:#14B3B5; color:#0F2537; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:8px}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
 .bottom-nav a.active{color:#14B3B5}
@@ -39,10 +37,7 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
       <b>Keranjang</b><b id="total" style="color:#14B3B5">Rp 0</b>
     </div>
     <div id="list-keranjang"><small style="color:#888">Belum ada barang</small></div>
-    <div class="btn-row">
-      <button onclick="simpanTransaksi()" class="btn-simpan">SIMPAN</button>
-      <button onclick="cetakStruk()" class="btn-cetak">CETAK</button>
-    </div>
+    <button onclick="simpanDanCetak()" class="btn-simpan-cetak">SIMPAN & CETAK</button>
   </div>
 
   <div class="bottom-nav">
@@ -88,26 +83,20 @@ function tambah(id){const item=produk.find(p=>p.id===id);const ada=keranjang.fin
 function kurang(id){const ada=keranjang.find(k=>k.id===id);if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);render()}
 function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div class="keranjang-item"><span>${i.nama}</span><div><button class="qty-btn" onclick="kurang(${i.id})">-</button><span style="margin:0 8px">${i.qty}</span><button class="qty-btn" onclick="tambah(${i.id})">+</button><span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div></div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`}
 
-function simpanTransaksi(){
+// FUNGSI BARU: 1 KLIK SIMPAN + CETAK
+function simpanDanCetak(){
   if(keranjang.length===0)return alert("Keranjang kosong");
+  
   const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
   const tanggal = new Date();
+  
+  // 1. SIMPAN KE RIWAYAT DULU
   const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
   riwayat.push({id:Date.now(), items:keranjang, total:total, tanggal:tanggal});
   localStorage.setItem('riwayat',JSON.stringify(riwayat));
   localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
-  alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
-  keranjang=[];render()
-}
 
-function cetakStruk(){
-  if(keranjang.length===0)return alert("Keranjang kosong");
-  const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
-  const tanggal = new Date();
-  const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
-  riwayat.push({id:Date.now(), items:keranjang, total:total, tanggal:tanggal});
-  localStorage.setItem('riwayat',JSON.stringify(riwayat));
-  
+  // 2. BUAT STRUK LALU CETAK
   let isiStruk = `
     <div style="text-align:center">
       <b>${namaToko}</b><br>
@@ -128,8 +117,12 @@ function cetakStruk(){
     </div>
   `;
   document.getElementById('struk').innerHTML = isiStruk;
-  window.print();
-  keranjang=[];render()
+  window.print(); // langsung muncul pilihan printer
+
+  // 3. KOSONGKAN KERANJANG
+  keranjang=[];
+  render();
+  alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
 }
 
 renderKategori(); renderProduk();
