@@ -1,10 +1,19 @@
+// app.js
 let db;
 const request = indexedDB.open("NUSAPOS_DB", 1);
+
 request.onupgradeneeded = (e) => {
     db = e.target.result;
-    if(!db.objectStoreNames.contains('transaksi')) db.createObjectStore('transaksi', { keyPath: 'id', autoIncrement: true });
+    if (!db.objectStoreNames.contains('transaksi')) {
+        db.createObjectStore('transaksi', { keyPath: 'id', autoIncrement: true });
+    }
 };
-request.onsuccess = (e) => { db = e.target.result; };
+
+request.onsuccess = (e) => {
+    db = e.target.result;
+    // Trigger event agar halaman tahu DB siap
+    window.dispatchEvent(new Event('db-ready'));
+};
 
 window.saveTransaction = async (data) => {
     return new Promise((resolve) => {
