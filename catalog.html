@@ -22,7 +22,7 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 @media print {
   body * { visibility: hidden; }
   #struk, #struk * { visibility: visible; }
-  #struk { position: absolute; left: 0; top: 0; width: 58mm; font-size: 11px; font-family: monospace; color: black; background: white; padding: 2mm }
+  #struk { position: absolute; left: 0; top: 0; width: 58mm; font-size: 11px; font-family: monospace; color: black; background: white; padding: 2mm; text-align:center }
 }
 #struk { display: none; }
 </style>
@@ -55,6 +55,8 @@ let kategoriAktif = "Semua";
 const produk=JSON.parse(localStorage.getItem('produk')) || [];
 const namaToko = localStorage.getItem('namaToko') || "NusaPOS";
 const alamatToko = localStorage.getItem('alamatToko') || "Bandung";
+const noHp = localStorage.getItem('noHp') || "";
+const footer = localStorage.getItem('footer') || "Terima Kasih"; // AMBIL FOOTER DARI SETTING
 
 function renderKategori(){
   const bar = document.getElementById('kategori-bar');
@@ -65,11 +67,7 @@ function renderKategori(){
   })
 }
 
-function filterKategori(k){
-  kategoriAktif = k;
-  renderKategori();
-  renderProduk();
-}
+function filterKategori(k){ kategoriAktif = k; renderKategori(); renderProduk(); }
 
 function renderProduk(){
   const list=document.getElementById('produk-list'); list.innerHTML='';
@@ -83,43 +81,43 @@ function tambah(id){const item=produk.find(p=>p.id===id);const ada=keranjang.fin
 function kurang(id){const ada=keranjang.find(k=>k.id===id);if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);render()}
 function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div class="keranjang-item"><span>${i.nama}</span><div><button class="qty-btn" onclick="kurang(${i.id})">-</button><span style="margin:0 8px">${i.qty}</span><button class="qty-btn" onclick="tambah(${i.id})">+</button><span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div></div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`}
 
-// FUNGSI BARU: 1 KLIK SIMPAN + CETAK
 function simpanDanCetak(){
   if(keranjang.length===0)return alert("Keranjang kosong");
   
   const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
   const tanggal = new Date();
   
-  // 1. SIMPAN KE RIWAYAT DULU
   const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
   riwayat.push({id:Date.now(), items:keranjang, total:total, tanggal:tanggal});
   localStorage.setItem('riwayat',JSON.stringify(riwayat));
   localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
 
-  // 2. BUAT STRUK LALU CETAK
   let isiStruk = `
-    <div style="text-align:center">
-      <b>${namaToko}</b><br>
+    <div>
+      <b style="font-size:14px">${namaToko}</b><br>
       <small>${alamatToko}</small><br>
+      ${noHp ? `<small>Telp: ${noHp}</small><br>` : ''}
       =========================<br>
     </div>
   `;
   keranjang.forEach(i=>{
-    isiStruk += `${i.nama}<br>
-    ${i.qty} x Rp ${i.harga.toLocaleString('id-ID')} = Rp ${(i.harga*i.qty).toLocaleString('id-ID')}<br>`
+    isiStruk += `<div style="text-align:left">${i.nama}</div>
+    <div style="display:flex; justify-content:space-between">
+      <span>${i.qty} x Rp ${i.harga.toLocaleString('id-ID')}</span> 
+      <span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span>
+    </div>`
   });
   isiStruk += `
     =========================<br>
     <div style="display:flex; justify-content:space-between"><b>TOTAL</b><b>Rp ${total.toLocaleString('id-ID')}</b></div>
-    <div style="text-align:center; margin-top:5px">
-      <small>${tanggal.toLocaleString('id-ID')}</small><br>
-      Terima Kasih<br>
+    <div style="margin-top:8px">
+      <small>${tanggal.toLocaleString('id-ID')}</small><br><br>
+      <b>${footer}</b> <br> <!-- INI FOOTERNYA -->
     </div>
   `;
   document.getElementById('struk').innerHTML = isiStruk;
-  window.print(); // langsung muncul pilihan printer
+  window.print();
 
-  // 3. KOSONGKAN KERANJANG
   keranjang=[];
   render();
   alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
