@@ -16,6 +16,7 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 .keranjang-item{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin:6px 0}
 .qty-btn{background:#2a3e4d; color:white; border:none; width:24px; height:24px; border-radius:6px; font-weight:bold}
 .btn-simpan-cetak{background:#14B3B5; color:#0F2537; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:8px}
+.btn-printer{background:#2a3e4d; color:white; width:100%; padding:10px; border-radius:10px; border:1px dashed #14B3B5; font-size:13px; margin-bottom:6px}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
 .bottom-nav a.active{color:#14B3B5}
@@ -31,12 +32,14 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
   <div class="header">Mesin Kasir <a href="dashboard.html" style="color:#0F2537; text-decoration:none">←</a></div>
   <div class="kategori-bar" id="kategori-bar"></div>
   <div id="produk-list" class="produk-grid"></div>
-  
+
   <div class="keranjang">
     <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
       <b>Keranjang</b><b id="total" style="color:#14B3B5">Rp 0</b>
     </div>
     <div id="list-keranjang"><small style="color:#888">Belum ada barang</small></div>
+    
+    <button onclick="pilihPrinter()" id="btn-printer" class="btn-printer">🔵 Pilih Printer Bluetooth</button>
     <button onclick="simpanDanCetak()" class="btn-simpan-cetak">SIMPAN & CETAK</button>
   </div>
 
@@ -52,11 +55,12 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 1
 <script>
 let keranjang=[];
 let kategoriAktif = "Semua";
+let isConnected = false; // STATUS BLUETOOTH
 const produk=JSON.parse(localStorage.getItem('produk')) || [];
 const namaToko = localStorage.getItem('namaToko') || "NusaPOS";
 const alamatToko = localStorage.getItem('alamatToko') || "Bandung";
 const noHp = localStorage.getItem('noHp') || "";
-const footer = localStorage.getItem('footer') || "Terima Kasih"; // AMBIL FOOTER DARI SETTING
+const footer = localStorage.getItem('footer') || "Terima Kasih"; 
 
 function renderKategori(){
   const bar = document.getElementById('kategori-bar');
@@ -81,42 +85,96 @@ function tambah(id){const item=produk.find(p=>p.id===id);const ada=keranjang.fin
 function kurang(id){const ada=keranjang.find(k=>k.id===id);if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);render()}
 function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div class="keranjang-item"><span>${i.nama}</span><div><button class="qty-btn" onclick="kurang(${i.id})">-</button><span style="margin:0 8px">${i.qty}</span><button class="qty-btn" onclick="tambah(${i.id})">+</button><span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div></div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`}
 
+// FUNGSI BARU: PILIH PRINTER BLUETOOTH
+function pilihPrinter(){
+  // Cek apakah plugin bluetoothSerial ada = Berarti udah di APK
+  if(typeof bluetoothSerial === 'undefined'){
+    alert("Fitur ini hanya jalan di APK. Di PWA pake cetak biasa");
+    return;
+  }
+  
+  bluetoothSerial.list(
+    function(devices){
+      let list = "Pilih Printer:\n";
+      devices.forEach((d,i)=> list += `${i+1}. ${d.name}\n`);
+      let pilih = prompt(list + "\nKetik nomor printer:");
+      if(pilih){
+        let device = devices[pilih-1];
+        bluetoothSerial.connect(device.address, 
+          function(){ 
+            isConnected = true;
+            document.getElementById('btn-printer').innerText = `✅ ${device.name}`;
+          },
+          function(){ alert("Gagal konek ke " + device.name) }
+        );
+      }
+    },
+    function(){ alert("Bluetooth mati / tidak ada printer") }
+  );
+}
+
+// FUNGSI BARU: CETAK BLUETOOTH ESC/POS UNTUK KASSEN
+function cetakBluetooth(strukText){
+  bluetoothSerial.write("\x1B\x40"); // INIT
+  bluetoothSerial.write("\x1D\x21\x00"); // FONT NORMAL
+  bluetoothSerial.write(strukText);
+  bluetoothSerial.write("\n\n\n\n\x1B\x69"); // FEED + POTONG
+}
+
+function buatFormatStruk(total, tanggal){
+  let struk = `\x1B\x61\x01`; // CENTER
+  struk += `${namaToko}\n`;
+  struk += `${alamatToko}\n`;
+  if(noHp) struk += `${noHp}\n`;
+  struk += `========================\n`; // 24 char buat 58mm
+  struk += `\x1B\x61\x00`; // LEFT
+
+  keranjang.forEach(i=>{
+    let nama = i.nama.substring(0,14);
+    let qty = i.qty + "x";
+    let harga = (i.harga*i.qty).toLocaleString('id-ID');
+    struk += `${nama}\n`;
+    struk += `${qty.padEnd(4,' ')}${harga.padStart(20,' ')}\n`; 
+  });
+  
+  struk += `========================\n`;
+  struk += `\x1B\x61\x02`; // RIGHT
+  struk += `TOTAL:Rp ${total.toLocaleString('id-ID')}\n`;
+  struk += `\x1B\x61\x01`; // CENTER
+  struk += `${tanggal.toLocaleString('id-ID')}\n`;
+  struk += `${footer}\n`;
+  return struk;
+}
+
+function buatFormatHTML(total, tanggal){ // BUAT FALLBACK PRINT
+  let isiStruk = `<div><b style="font-size:14px">${namaToko}</b><br><small>${alamatToko}</small><br>${noHp ? `<small>Telp: ${noHp}</small><br>` : ''}=========================<br></div>`;
+  keranjang.forEach(i=>{
+    isiStruk += `<div style="text-align:left">${i.nama}</div><div style="display:flex; justify-content:space-between"><span>${i.qty} x Rp ${i.harga.toLocaleString('id-ID')}</span> <span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div>`
+  });
+  isiStruk += `=========================<br><div style="display:flex; justify-content:space-between"><b>TOTAL</b><b>Rp ${total.toLocaleString('id-ID')}</b></div><div style="margin-top:8px"><small>${tanggal.toLocaleString('id-ID')}</small><br><br><b>${footer}</b><br></div>`;
+  return isiStruk;
+}
+
 function simpanDanCetak(){
   if(keranjang.length===0)return alert("Keranjang kosong");
-  
+
   const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
   const tanggal = new Date();
-  
   const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
   riwayat.push({id:Date.now(), items:keranjang, total:total, tanggal:tanggal});
   localStorage.setItem('riwayat',JSON.stringify(riwayat));
   localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
 
-  let isiStruk = `
-    <div>
-      <b style="font-size:14px">${namaToko}</b><br>
-      <small>${alamatToko}</small><br>
-      ${noHp ? `<small>Telp: ${noHp}</small><br>` : ''}
-      =========================<br>
-    </div>
-  `;
-  keranjang.forEach(i=>{
-    isiStruk += `<div style="text-align:left">${i.nama}</div>
-    <div style="display:flex; justify-content:space-between">
-      <span>${i.qty} x Rp ${i.harga.toLocaleString('id-ID')}</span> 
-      <span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span>
-    </div>`
-  });
-  isiStruk += `
-    =========================<br>
-    <div style="display:flex; justify-content:space-between"><b>TOTAL</b><b>Rp ${total.toLocaleString('id-ID')}</b></div>
-    <div style="margin-top:8px">
-      <small>${tanggal.toLocaleString('id-ID')}</small><br><br>
-      <b>${footer}</b> <br> <!-- INI FOOTERNYA -->
-    </div>
-  `;
-  document.getElementById('struk').innerHTML = isiStruk;
-  window.print();
+  // CEK MODE: APK ATAU PWA
+  if(typeof bluetoothSerial !== 'undefined' && isConnected){
+    // MODE 1: CETAK BLUETOOTH DI APK
+    let strukBT = buatFormatStruk(total, tanggal);
+    cetakBluetooth(strukBT);
+  } else {
+    // MODE 2: CETAK BIASA DI PWA/CHROME
+    document.getElementById('struk').innerHTML = buatFormatHTML(total, tanggal);
+    window.print();
+  }
 
   keranjang=[];
   render();
