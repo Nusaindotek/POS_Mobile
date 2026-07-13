@@ -7,9 +7,9 @@
 body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 70px 0}
 .header{display:flex; align-items:center; justify-content:space-between; padding:16px;}
 .header-left{display:flex; align-items:center; gap:12px}
-.header img{width:45px; height:45px; border-radius:10px}
-.header b{font-size:18px}
-.header small{color:#14B3B5}
+.header img{width:40px; height:40px; border-radius:8px; object-fit:cover} /* DIKECILIN JADI 40PX */
+.header b{font-size:16px} /* DIKECILIN JUGA */
+.header small{color:#14B3B5; font-size:12px}
 .waktu{color:#14B3B5; font-weight:bold}
 .card{background:#1a2e3d; margin:12px; padding:16px; border-radius:12px}
 .card-flex{display:flex; justify-content:space-between}
@@ -28,9 +28,9 @@ canvas{background:transparent; width:100% !important; height:220px !important}
 <body>
   <div class="header">
     <div class="header-left">
-      <img src="https://via.placeholder.com/45/14B3B5/0F2537?text=N">
+      <img id="logo-dashboard" src="https://via.placeholder.com/40/14B3B5/0F2537?text=N"> <!-- ADA ID -->
       <div>
-        <b>NusaPOS Owner</b><br>
+        <b id="nama-dashboard">NusaPOS</b><br> <!-- ADA ID + DIKECILIN -->
         <small>Status: Premium Beta</small>
       </div>
     </div>
@@ -71,6 +71,10 @@ canvas{background:transparent; width:100% !important; height:220px !important}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// 0. LOAD NAMA TOKO & LOGO DARI SETTING
+document.getElementById('nama-dashboard').innerText = localStorage.getItem('namaToko') || 'NusaPOS';
+document.getElementById('logo-dashboard').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/40/14B3B5/0F2537?text=N';
+
 // Update jam real time
 setInterval(()=>{
   document.getElementById('jam').innerText = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
@@ -93,7 +97,7 @@ for(let i=6; i>=0; i--){
   d.setDate(d.getDate() - i);
   const tgl = d.toLocaleDateString('id-ID');
   labels.push(d.toLocaleDateString('id-ID', {weekday: 'short'})); // Sen, Sel
-  
+
   const omset = riwayat
     .filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === tgl)
     .reduce((sum, t) => sum + t.total, 0);
@@ -103,13 +107,13 @@ for(let i=6; i>=0; i--){
 // 3. GAMBAR GRAFIK BATANG
 const ctx = document.getElementById('grafik');
 new Chart(ctx, {
-  type: 'bar', // GANTI JADI BAR
+  type: 'bar',
   data: {
     labels: labels,
     datasets: [{
       label: 'Omset',
       data: dataOmset,
-      backgroundColor: '#14B3B5', // warna tosca
+      backgroundColor: '#14B3B5',
       borderRadius: 8,
       barThickness: 25
     }]
@@ -120,7 +124,7 @@ new Chart(ctx, {
       y: {
         ticks: {
           color: '#888',
-          callback: function(value) { return 'Rp ' + (value/1000) + 'k' } // jadi Rp 100k
+          callback: function(value) { return 'Rp ' + (value/1000) + 'k' }
         }, 
         grid: {color: 'rgba(255,255,255,0.1)'}
       },
