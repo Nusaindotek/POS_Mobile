@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NusaPOS Mobile</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NusaPOS</title>
 <style>
-body{background:#0F2537; color:white; font-family:Arial; text-align:center; padding:30px; margin:0}
-h1{color:#14B3B5}
-a{display:block; background:#14B3B5; color:#0F2537; padding:16px; margin:12px 20px; border-radius:12px; text-decoration:none; font-weight:bold; font-size:16px}
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-size:18px; font-weight:bold; display:flex; justify-content:space-between}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+.bottom-nav a.active{color:#14B3B5; font-weight:bold}
 </style>
 </head>
 <body>
-  <h1>NusaPOS Mobile</h1>
-  <p>Versi 1.0 Beta</p>
-  <a href="dashboard.html">1. Dashboard</a>
-  <a href="catalog.html">2. Kasir</a>
-  <a href="report.html">3. Laporan</a>
-  <a href="setting.html">4. Setting</a>
+  <div class="header">NusaPOS</div>
+  <div class="card">
+    <h3>Selamat Datang</h3>
+    <p>Pilih menu di bawah untuk mulai</p>
+  </div>
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="active">🏠<br>Dashboard</a>
+    <a href="catalog.html">🧾<br>Kasir</a>
+    <a href="report.html">📊<br>Laporan</a>
+    <a href="setting.html">🏪<br>Info Toko</a>
+  </div>
 </body>
 </html>
