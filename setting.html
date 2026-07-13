@@ -9,10 +9,13 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 6
 .container{padding:12px}
 .input-group{margin-bottom:12px}
 .input-group label{display:block; margin-bottom:6px; font-size:14px}
-.input-group input, .input-group textarea{width:100%; padding:10px; border-radius:8px; border:1px solid #2a3e4d; background:#1a2e3d; color:white; box-sizing:border-box}
+.input-group input,.input-group textarea,.input-group select{width:100%; padding:10px; border-radius:8px; border:1px solid #2a3e4d; background:#1a2e3d; color:white; box-sizing:border-box}
 .btn-simpan{background:#14B3B5; color:#0F2537; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px}
+.btn-abu{background:#2a3e4d; color:white; width:100%; padding:10px; border-radius:8px; border:none; font-size:14px; margin-top:6px}
 .card{background:#1a2e3d; padding:12px; border-radius:10px; margin-bottom:12px; border:1px solid #2a3e4d}
 .btn-printer{width:100%; padding:10px; background:#2a3e4d; color:white; border:1px dashed #14B3B5; border-radius:8px; font-size:14px}
+.list-item{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #2a3e4d; font-size:14px}
+.list-item button{background:red; color:white; border:none; padding:4px 8px; border-radius:6px; font-size:12px}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
 .bottom-nav a.active{color:#14B3B5}
@@ -20,37 +23,52 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 6
 </head>
 <body>
   <div class="header">Info Toko <a href="dashboard.html" style="color:#0F2537; text-decoration:none">←</a></div>
-  
+
   <div class="container">
+    <!-- DATA TOKO -->
     <div class="card">
       <b>Data Toko</b>
-      <div class="input-group">
-        <label>Nama Toko</label>
-        <input type="text" id="namaToko" placeholder="Contoh: Warung Nusa">
-      </div>
-      <div class="input-group">
-        <label>Alamat</label>
-        <textarea id="alamatToko" rows="2" placeholder="Contoh: Jl. Bandung No.1"></textarea>
-      </div>
-      <div class="input-group">
-        <label>No HP</label>
-        <input type="text" id="noHp" placeholder="Contoh: 0812...">
-      </div>
-      <div class="input-group">
-        <label>Footer Struk</label>
-        <input type="text" id="footer" placeholder="Contoh: Terima Kasih">
-      </div>
+      <div class="input-group"><label>Nama Toko</label><input type="text" id="namaToko"></div>
+      <div class="input-group"><label>Alamat</label><textarea id="alamatToko" rows="2"></textarea></div>
+      <div class="input-group"><label>No HP</label><input type="text" id="noHp"></div>
+      <div class="input-group"><label>Footer Struk</label><input type="text" id="footer"></div>
+      <button onclick="simpanDataToko()" class="btn-simpan">SIMPAN DATA TOKO</button>
     </div>
 
+    <!-- PRINTER -->
     <div class="card">
       <b>Pengaturan Printer</b>
-      <button onclick="pilihPrinterSetting()" id="btn-printer-setting" class="btn-printer" style="margin-top:8px">
-        🔵 Pilih Printer Bluetooth
-      </button>
+      <button onclick="pilihPrinterSetting()" id="btn-printer-setting" class="btn-printer" style="margin-top:8px">🔵 Pilih Printer Bluetooth</button>
       <small id="status-printer" style="color:#888; display:block; margin-top:6px">Belum ada printer dipilih</small>
     </div>
 
-    <button onclick="simpanData()" class="btn-simpan">SIMPAN DATA TOKO</button>
+    <!-- KELOLA KATEGORI -->
+    <div class="card">
+      <b>Kelola Kategori</b>
+      <div style="display:flex; gap:8px; margin-top:8px">
+        <input type="text" id="inputKategori" placeholder="Nama Kategori Baru">
+        <button onclick="tambahKategori()" class="btn-abu" style="width:auto">+</button>
+      </div>
+      <div id="listKategori" style="margin-top:10px"></div>
+    </div>
+
+    <!-- KELOLA PRODUK -->
+    <div class="card">
+      <b>Kelola Produk</b>
+      <div class="input-group"><label>Nama Produk</label><input type="text" id="namaProduk"></div>
+      <div class="input-group"><label>Harga</label><input type="number" id="hargaProduk"></div>
+      <div class="input-group"><label>Kategori</label><select id="kategoriProduk"></select></div>
+      <button onclick="tambahProduk()" class="btn-simpan">TAMBAH PRODUK</button>
+      <div id="listProduk" style="margin-top:10px"></div>
+    </div>
+
+    <!-- BACKUP RESTORE -->
+    <div class="card">
+      <b>Backup & Restore</b>
+      <button onclick="backupData()" class="btn-abu">EXPORT DATA</button>
+      <input type="file" id="fileRestore" onchange="restoreData(event)" style="display:none">
+      <button onclick="document.getElementById('fileRestore').click()" class="btn-abu">IMPORT DATA</button>
+    </div>
   </div>
 
   <div class="bottom-nav">
@@ -61,21 +79,27 @@ body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 6
   </div>
 
 <script>
-// LOAD DATA SAAT BUKA HALAMAN
+let produk = JSON.parse(localStorage.getItem('produk')) || [];
+let kategori = JSON.parse(localStorage.getItem('kategori')) || ["Makanan","Minuman","Snack"];
+
 window.onload = function(){
+  // LOAD DATA TOKO
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || "";
   document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || "";
   document.getElementById('noHp').value = localStorage.getItem('noHp') || "";
   document.getElementById('footer').value = localStorage.getItem('footer') || "Terima Kasih";
-  
+
+  // LOAD PRINTER
   const nama = localStorage.getItem('printerName');
   if(nama){
     document.getElementById('btn-printer-setting').innerText = `✅ ${nama}`;
     document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`;
   }
+  renderKategori(); renderProduk();
 }
 
-function simpanData(){
+// DATA TOKO
+function simpanDataToko(){
   localStorage.setItem('namaToko', document.getElementById('namaToko').value);
   localStorage.setItem('alamatToko', document.getElementById('alamatToko').value);
   localStorage.setItem('noHp', document.getElementById('noHp').value);
@@ -83,12 +107,9 @@ function simpanData(){
   alert("Data toko berhasil disimpan");
 }
 
+// PRINTER
 function pilihPrinterSetting(){
-  if(typeof bluetoothSerial === 'undefined'){
-    alert("Fitur ini hanya jalan di APK Android");
-    return;
-  }
-  
+  if(typeof bluetoothSerial === 'undefined'){ alert("Fitur ini hanya jalan di APK Android"); return; }
   bluetoothSerial.list(
     function(devices){
       if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan");
@@ -97,8 +118,8 @@ function pilihPrinterSetting(){
       let pilih = prompt(list + "\nKetik nomor printer:");
       if(pilih){
         let device = devices[pilih-1];
-        bluetoothSerial.connect(device.address, 
-          function(){ 
+        bluetoothSerial.connect(device.address,
+          function(){
             localStorage.setItem('printerAddress', device.address);
             localStorage.setItem('printerName', device.name);
             document.getElementById('btn-printer-setting').innerText = `✅ ${device.name}`;
@@ -111,6 +132,59 @@ function pilihPrinterSetting(){
     },
     function(){ alert("Bluetooth mati") }
   );
+}
+
+// KATEGORI
+function renderKategori(){
+  const list = document.getElementById('listKategori');
+  const select = document.getElementById('kategoriProduk');
+  list.innerHTML = ''; select.innerHTML = '';
+  kategori.forEach((k,i)=>{
+    list.innerHTML += `<div class="list-item"><span>${k}</span><button onclick="hapusKategori(${i})">Hapus</button></div>`;
+    select.innerHTML += `<option value="${k}">${k}</option>`;
+  })
+}
+function tambahKategori(){
+  const input = document.getElementById('inputKategori').value;
+  if(input){ kategori.push(input); localStorage.setItem('kategori',JSON.stringify(kategori)); document.getElementById('inputKategori').value=''; renderKategori(); }
+}
+function hapusKategori(i){ kategori.splice(i,1); localStorage.setItem('kategori',JSON.stringify(kategori)); renderKategori(); }
+
+// PRODUK
+function renderProduk(){
+  const list = document.getElementById('listProduk'); list.innerHTML='';
+  produk.forEach((p,i)=>{
+    list.innerHTML += `<div class="list-item"><span>${p.nama} - Rp ${p.harga.toLocaleString('id-ID')}</span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
+  })
+}
+function tambahProduk(){
+  const nama = document.getElementById('namaProduk').value;
+  const harga = parseInt(document.getElementById('hargaProduk').value);
+  const kat = document.getElementById('kategoriProduk').value;
+  if(nama && harga){ produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat}); localStorage.setItem('produk',JSON.stringify(produk)); document.getElementById('namaProduk').value=''; document.getElementById('hargaProduk').value=''; renderProduk(); }
+}
+function hapusProduk(i){ produk.splice(i,1); localStorage.setItem('produk',JSON.stringify(produk)); renderProduk(); }
+
+// BACKUP RESTORE
+function backupData(){
+  const data = {produk:produk, kategori:kategori, namaToko:localStorage.getItem('namaToko'), alamatToko:localStorage.getItem('alamatToko'), noHp:localStorage.getItem('noHp'), footer:localStorage.getItem('footer')};
+  const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='backup-nusapos.json'; a.click();
+}
+function restoreData(e){
+  const file = e.target.files[0]; const reader = new FileReader();
+  reader.onload = function(event){
+    const data = JSON.parse(event.target.result);
+    localStorage.setItem('produk',JSON.stringify(data.produk));
+    localStorage.setItem('kategori',JSON.stringify(data.kategori));
+    localStorage.setItem('namaToko',data.namaToko);
+    localStorage.setItem('alamatToko',data.alamatToko);
+    localStorage.setItem('noHp',data.noHp);
+    localStorage.setItem('footer',data.footer);
+    location.reload();
+  }
+  reader.readAsText(file);
 }
 </script>
 </body>
