@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalog Barang</title>
+<style>
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-weight:bold; display:flex; justify-content:space-between}
+.card{background:white; margin:12px; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center}
+.btn-tambah{background:#14B3B5; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; width:calc(100% - 24px); margin:12px}
+.input{width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:8px; box-sizing:border-box}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
+</style>
+</head>
+<body>
+  <div class="header">Katalog Barang <a href="dashboard.html" style="color:white">←</a></div>
+  <div id="list-produk"></div>
+  <button class="btn-tambah" onclick="tambahProduk()">+ Tambah Produk Baru</button>
+
+  <div class="bottom-nav">
+    <a href="dashboard.html">🏠<br>Dashboard</a>
+    <a href="catalog.html">🧾<br>Kasir</a>
+    <a href="report.html">📊<br>Laporan</a>
+    <a href="setting.html">🏪<br>Info Toko</a>
+  </div>
+  <script>
+    let produk=JSON.parse(localStorage.getItem('produk')) || [
+      {id:1,nama:"Nasi Goreng",harga:15000},{id:2,nama:"Es Teh",harga:4000},
+    ];
+    function render(){
+      const list=document.getElementById('list-produk'); list.innerHTML='';
+      produk.forEach(p=>{
+        list.innerHTML+=`<div class="card"><div><b>${p.nama}</b><br><small>Rp ${p.harga.toLocaleString('id-ID')}</small></div><button onclick="hapus(${p.id})">Hapus</button></div>`
+      })
+    }
+    function tambahProduk(){
+      const nama=prompt("Nama Produk:");
+      const harga=prompt("Harga:");
+      if(nama && harga){
+        produk.push({id:Date.now(),nama,harga:parseInt(harga)});
+        localStorage.setItem('produk',JSON.stringify(produk));
+        render();
+      }
+    }
+    function hapus(id){
+      produk=produk.filter(p=>p.id!==id);
+      localStorage.setItem('produk',JSON.stringify(produk));
+      render();
+    }
+    render();
+  </script>
+</body>
+</html>
