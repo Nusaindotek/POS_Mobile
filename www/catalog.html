@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NusaPOS Mobile - Katalog</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nusanavy: '#0F2537',
+            nusatosca: '#14B3B5',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
+
+  <!-- TOP BAR -->
+  <header class="bg-nusanavy border-b border-gray-800 p-4 flex justify-between items-center shadow-md">
+    <div class="flex items-center space-x-3">
+      <a href="dashboard.html" class="text-nusatosca font-bold text-sm bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
+        ⬅ Dashboard
+      </a>
+    </div>
+    <h1 class="text-md font-bold tracking-wide text-gray-300">Kelola Produk</h1>
+  </header>
+
+  <!-- MAIN AREA -->
+  <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
+    
+    <!-- Form Tambah Produk -->
+    <div class="bg-gray-900/60 backdrop-blur p-4 rounded-xl border border-gray-800 space-y-3 shadow-lg">
+      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">Tambah Produk Baru</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <input type="text" id="prod-name" placeholder="Nama Produk" class="col-span-2 bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+        <input type="number" id="prod-price" placeholder="Harga Jual (Rp)" class="bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+        <input type="number" id="prod-stock" placeholder="Stok Awal" class="bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
+      </div>
+      <button class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
+        + Simpan ke Katalog
+      </button>
+    </div>
+
+    <!-- Daftar Produk -->
+    <div class="bg-gray-900/40 rounded-xl border border-gray-800 overflow-hidden shadow-lg">
+      <div class="bg-gray-900/80 p-3 border-b border-gray-800">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Daftar Katalog Aktif</span>
+      </div>
+      <div class="p-3 divide-y divide-gray-800" id="catalog-list">
+        <!-- Contoh data terisi -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER NAVIGATION (Diselaraskan dengan Dashboard & Setting) -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
+    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
+      <span class="text-xl">📊</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
+    </a>
+    <a href="setting.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
+      <span class="text-xl">⚙️</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider">Settings</span>
+    </a>
+  </footer>
+
+</body>
+</html>
