@@ -13,6 +13,7 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
 .btn-logo{background:transparent; color:#14B3B5; border:2px solid #14B3B5; padding:10px 20px; border-radius:25px; font-weight:bold; cursor:pointer}
 .input{width:100%; padding:14px; margin:8px 0; border:1px solid #ddd; border-radius:10px; box-sizing:border-box; font-size:15px}
 .btn-simpan{background:#14B3B5; color:white; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px}
+.btn-printer{width:100%; padding:14px; background:#F5F7FA; color:#14B3B5; border:2px dashed #14B3B5; border-radius:10px; font-size:15px; font-weight:bold; margin-top:8px}
 .kontak-wa{display:flex; align-items:center; gap:12px; background:#E8F8F9; padding:16px; border-radius:12px; text-decoration:none; color:#333}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
@@ -39,15 +40,19 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <input class="input" id="namaToko" placeholder="🏪 Nama Toko">
     <input class="input" id="alamatToko" placeholder="📍 Alamat">
     <input class="input" id="noHp" placeholder="📞 Nomor HP">
-    
-    <!-- PAJAK SUDAH DIHAPUS. TINGGAL UKURAN KERTAS SAJA -->
+
     <select class="input" id="ukuranKertas">
       <option>58 mm</option>
       <option>80 mm</option>
     </select>
-    
+
+    <!-- FITUR BARU: PAIRING PRINTER BLUETOOTH -->
+    <b>Pengaturan Printer</b>
+    <button class="btn-printer" onclick="pilihPrinter()">🔵 Pilih Printer Bluetooth</button>
+    <small id="status-printer" style="color:#888; display:block; margin-top:6px">Belum ada printer dipilih</small>
+
     <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
-    
+
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
 
@@ -65,16 +70,23 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
   </div>
 
 <script>
-// LOAD DATA SAAT BUKA HALAMAN - SUDAH DITAMBAH NOHP & FOOTER
+// LOAD DATA SAAT BUKA HALAMAN
 window.onload = function(){
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
   document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
-  document.getElementById('noHp').value = localStorage.getItem('noHp') || ''; // INI YANG DITAMBAH
+  document.getElementById('noHp').value = localStorage.getItem('noHp') || '';
   document.getElementById('ukuranKertas').value = localStorage.getItem('ukuranKertas') || '58 mm';
-  document.getElementById('footer').value = localStorage.getItem('footer') || ''; // INI YANG DITAMBAH
+  document.getElementById('footer').value = localStorage.getItem('footer') || '';
   document.getElementById('logo-preview').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/70/F5F7FA/888?text=🏪';
   document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
   document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
+
+  // CEK STATUS PRINTER
+  const nama = localStorage.getItem('printerName');
+  if(nama){
+    document.getElementById('btn-printer-setting').innerText = `✅ ${nama}`;
+    document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`;
+  }
 }
 
 // Fitur upload logo
@@ -89,16 +101,46 @@ document.getElementById('uploadLogo').addEventListener('change', function(e){
 })
 
 function simpanInfo(){
-  // SIMPAN SEMUA TERMASUK NOHP & FOOTER
   localStorage.setItem('namaToko', document.getElementById('namaToko').value);
   localStorage.setItem('alamatToko', document.getElementById('alamatToko').value);
-  localStorage.setItem('noHp', document.getElementById('noHp').value); // INI YANG DITAMBAH
+  localStorage.setItem('noHp', document.getElementById('noHp').value);
   localStorage.setItem('ukuranKertas', document.getElementById('ukuranKertas').value);
-  localStorage.setItem('footer', document.getElementById('footer').value); // INI YANG DITAMBAH
-  
+  localStorage.setItem('footer', document.getElementById('footer').value);
+
   document.getElementById('nama-toko-view').innerText = document.getElementById('namaToko').value;
   document.getElementById('alamat-view').innerText = document.getElementById('alamatToko').value;
   alert('Info Toko Tersimpan!');
+}
+
+// FUNGSI BARU: PILIH PRINTER BLUETOOTH
+function pilihPrinter(){
+  if(typeof bluetoothSerial === 'undefined'){
+    alert("Fitur ini hanya jalan di APK Android. Di PWA tidak bisa");
+    return;
+  }
+
+  bluetoothSerial.list(
+    function(devices){
+      if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan. Nyalakan bluetooth dulu");
+      let list = "Pilih Printer:\n";
+      devices.forEach((d,i)=> list += `${i+1}. ${d.name}\n`);
+      let pilih = prompt(list + "\nKetik nomor printer:");
+      if(pilih){
+        let device = devices[pilih-1];
+        bluetoothSerial.connect(device.address,
+          function(){
+            localStorage.setItem('printerAddress', device.address);
+            localStorage.setItem('printerName', device.name);
+            document.getElementById('btn-printer-setting').innerText = `✅ ${device.name}`;
+            document.getElementById('status-printer').innerText = `Terhubung ke ${device.name}`;
+            alert("Printer berhasil disimpan");
+          },
+          function(){ alert("Gagal konek ke " + device.name) }
+        );
+      }
+    },
+    function(){ alert("Bluetooth mati") }
+  );
 }
 </script>
 </body>
