@@ -2,167 +2,147 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NusaPOS Mobile - Katalog</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            nusanavy: '#0F2537',
-            nusatosca: '#14B3B5',
-          }
-        }
-      }
-    }
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NusaPOS Mobile - Kasir</title>
+  <style>
+    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 120px; }
+    .header { display:flex; justify-content:space-between; align-items:center; padding: 15px; border-bottom: 1px solid #2a3e4d; position:sticky; top:0; background:#0F2537; }
+    .produk-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; padding:15px; }
+    .produk-card { background: #1a2e3d; padding: 12px; border-radius: 12px; border: 1px solid #2a3e4d; text-align:center; }
+    .produk-card button { background:#14B3B5; color:#0F2537; border:none; padding:6px 12px; border-radius:8px; font-weight:bold; margin-top:8px; width:100% }
+    .keranjang { position:fixed; bottom:0; width:100%; background:#0a141c; border-top:1px solid #2a3e4d; padding:15px; }
+    .keranjang-item { display:flex; justify-content:space-between; font-size:12px; margin:5px 0; }
+    .btn-simpan { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; margin-top:10px }
+    .tosca { color: #14B3B5; }
+  </style>
 </head>
-<body class="bg-nusanavy font-sans h-screen flex flex-col justify-between overflow-hidden select-none text-white">
+<body>
 
-  <header class="bg-nusanavy border-b border-gray-800 pt-6 pb-4 px-4 flex justify-between items-center shadow-md">
-    <div class="flex items-center space-x-3">
-      <a href="dashboard.html" class="text-nusatosca font-bold text-xs bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 active:scale-95 transition">
-        ⬅ Menu
-      </a>
-      <img src="../icon.png" alt="Logo" class="w-7 h-7 object-contain">
-      <h1 class="text-sm font-bold tracking-wide">Katalog Barang</h1>
+  <div class="header">
+    <h1 style="font-size:16px; margin:0;">Kasir</h1>
+    <a href="dashboard.html" style="color:#14B3B5; text-decoration:none; font-size:12px">← Kembali</a>
+  </div>
+
+  <div id="produk-list" class="produk-grid">
+    <!-- Produk akan diisi dari DB -->
+  </div>
+
+  <div class="keranjang">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+      <b>Keranjang</b>
+      <b class="tosca" id="total-harga">Rp 0</b>
     </div>
-    <span id="clock" class="text-xs font-mono text-nusatosca font-bold bg-gray-900/40 px-2 py-1 rounded">00:00</span>
-  </header>
-
-  <main class="flex-1 overflow-y-auto p-4 space-y-5 pb-24">
-    
-    <div class="bg-gray-900/60 backdrop-blur p-4 rounded-xl border border-gray-800 space-y-3 shadow-lg">
-      <h3 class="text-xs font-bold text-nusatosca uppercase tracking-wider">➕ Tambah Produk Baru</h3>
-      
-      <div class="space-y-2">
-        <div>
-          <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Nama Barang</label>
-          <input type="text" id="prod-name" placeholder="Contoh: Kopi Hitam" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-        </div>
-        <div>
-          <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Harga Jual (Rp)</label>
-          <input type="number" id="prod-price" placeholder="Contoh: 15000" class="w-full bg-nusanavy/80 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-nusatosca text-white">
-        </div>
-        <button onclick="saveProduct()" class="w-full bg-nusatosca text-nusanavy font-extrabold py-2.5 rounded-lg text-sm shadow-md hover:bg-teal-400 active:scale-95 transition uppercase tracking-wide">
-          Simpan ke Katalog
-        </button>
-      </div>
+    <div id="list-keranjang">
+      <small style="color:#888">Belum ada barang</small>
     </div>
-
-    <div class="space-y-2">
-      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Daftar Produk Aktif</h3>
-      <div id="catalog-list" class="bg-gray-900/40 rounded-xl border border-gray-800 divide-y divide-gray-800/60 shadow-lg overflow-hidden">
-        </div>
-    </div>
-
-  </main>
-
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-900 p-3 flex justify-around z-50">
-    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
-      <span class="text-xl">📊</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
-    </a>
-    <a href="setting.html" class="flex flex-col items-center space-y-1 text-gray-500 hover:text-nusatosca">
-      <span class="text-xl">⚙️</span>
-      <span class="text-[10px] font-bold uppercase tracking-wider">Settings</span>
-    </a>
-  </footer>
+    <button onclick="simpanTransaksi()" class="btn-simpan">SIMPAN TRANSAKSI</button>
+  </div>
 
   <script>
-    // Data bawaan awal jika database kosong
-    const defaultProducts = [
-      { id: 'p1', name: 'Kopi Susu Aren', price: 22000 },
-      { id: 'p2', name: 'Roti Bakar Cokelat', price: 15000 },
-      { id: 'p3', name: 'Es Teh Manis Jumbo', price: 7000 },
-      { id: 'p4', name: 'Kentang Goreng Krispi', price: 18000 }
-    ];
-
-    // Fungsi menyimpan produk baru
-    function saveProduct() {
-      const nameInput = document.getElementById('prod-name');
-      const priceInput = document.getElementById('prod-price');
-
-      if (!nameInput.value.trim() || !priceInput.value) {
-        alert('Nama barang dan harga harus diisi!');
-        return;
-      }
-
-      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
-      if (!catalog || catalog.length === 0) {
-        catalog = [...defaultProducts];
-      }
-
-      // Masukkan item baru ke dalam database array
-      catalog.push({
-        id: 'p_' + Date.now(),
-        name: nameInput.value.trim(),
-        price: parseInt(priceInput.value)
-      });
-
-      localStorage.setItem('catalog_products', JSON.stringify(catalog));
-      
-      // Reset input form
-      nameInput.value = '';
-      priceInput.value = '';
-      
-      renderCatalog();
-    }
-
-    // Fungsi menghapus produk dari daftar
-    window.deleteProduct = function(prodId) {
-      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
-      if (!catalog || catalog.length === 0) {
-        catalog = [...defaultProducts];
-      }
-      
-      catalog = catalog.filter(p => p.id !== prodId);
-      localStorage.setItem('catalog_products', JSON.stringify(catalog));
-      renderCatalog();
-    }
-
-    // Fungsi menampilkan daftar barang ke layar HP
-    function renderCatalog() {
-      const container = document.getElementById('catalog-list');
-      let catalog = JSON.parse(localStorage.getItem('catalog_products'));
-      
-      // Jika pertama kali buka dan kosong, inisialisasi dengan data default
-      if (!catalog) {
-        catalog = [...defaultProducts];
-        localStorage.setItem('catalog_products', JSON.stringify(catalog));
-      }
-
-      if (catalog.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 text-xs py-6">Katalog kosong. Silakan tambah barang.</p>`;
-        return;
-      }
-
-      container.innerHTML = '';
-      catalog.forEach(product => {
-        const div = document.createElement('div');
-        div.className = "p-4 flex justify-between items-center";
-        div.innerHTML = `
-          <div>
-            <h4 class="text-xs font-bold text-gray-200">${product.name}</h4>
-            <p class="text-[10px] text-nusatosca font-medium">Rp ${product.price.toLocaleString('id-ID')}</p>
-          </div>
-          <button onclick="deleteProduct('${product.product_id || product.id}')" class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded-lg active:scale-95 transition">
-            Hapus
-          </button>
-        `;
-        container.appendChild(div);
-      });
-    }
+    let db;
+    let keranjang = [];
+    let produk = [];
 
     document.addEventListener("DOMContentLoaded", () => {
-      renderCatalog();
+      const request = indexedDB.open("NUSAPOS_DB", 1);
+      request.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if(!db.objectStoreNames.contains('produk')) db.createObjectStore('produk', {keyPath: 'id'});
+        if(!db.objectStoreNames.contains('transaksi')) db.createObjectStore('transaksi', {keyPath: 'id'});
+      };
+      request.onsuccess = (e) => { 
+        db = e.target.result; 
+        loadProduk();
+      };
     });
 
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    }, 1000);
+    async function getAllData(storeName) {
+        return new Promise((resolve) => {
+            db.transaction(storeName, "readonly").objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
+        });
+    }
+
+    async function loadProduk() {
+      produk = await getAllData('produk');
+      if(produk.length === 0) { // isi dummy kalau kosong
+        produk = [
+          {id:1, nama:"Nasi Goreng", harga:15000},
+          {id:2, nama:"Es Teh", harga:4000},
+          {id:3, nama:"Ayam Bakar", harga:20000},
+          {id:4, nama:"Aqua", harga:3000},
+        ];
+        const tx = db.transaction('produk', 'readwrite');
+        produk.forEach(p => tx.objectStore('produk').add(p));
+      }
+      
+      const list = document.getElementById('produk-list');
+      list.innerHTML = '';
+      produk.forEach(p => {
+        list.innerHTML += `
+          <div class="produk-card">
+            <b>${p.nama}</b><br>
+            <small class="tosca">Rp ${p.harga.toLocaleString('id-ID')}</small><br>
+            <button onclick="tambahKeranjang(${p.id})">+ Tambah</button>
+          </div>
+        `;
+      });
+    }
+
+    function tambahKeranjang(id) {
+      const item = produk.find(p => p.id === id);
+      const diKeranjang = keranjang.find(k => k.id === id);
+      if(diKeranjang) diKeranjang.qty++;
+      else keranjang.push({...item, qty:1});
+      renderKeranjang();
+    }
+
+    function renderKeranjang() {
+      const list = document.getElementById('list-keranjang');
+      const total = keranjang.reduce((sum, i) => sum + i.harga * i.qty, 0);
+      document.getElementById('total-harga').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+      
+      if(keranjang.length === 0) {
+        list.innerHTML = `<small style="color:#888">Belum ada barang</small>`;
+        return;
+      }
+      list.innerHTML = '';
+      keranjang.forEach(i => {
+        list.innerHTML += `<div class="keranjang-item"><span>${i.nama} x${i.qty}</span><span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div>`
+      });
+    }
+
+    function buatStruk(transaksi) {
+      let struk = `========================\n     NUSAPOS STORE\n========================\n`;
+      transaksi.items.forEach(item => {
+        struk += `${item.nama}\n${item.qty} x ${item.harga.toLocaleString('id-ID')} = ${(item.qty*item.harga).toLocaleString('id-ID')}\n`;
+      });
+      struk += `------------------------\nTOTAL: Rp ${transaksi.total.toLocaleString('id-ID')}\n========================\n  TERIMA KASIH\n`;
+      return struk;
+    }
+
+    function simpanTransaksi() {
+      if(keranjang.length === 0) return alert("Keranjang kosong");
+      
+      const totalHarga = keranjang.reduce((sum, i) => sum + i.harga * i.qty, 0);
+      const transaksiBaru = {
+          id: Date.now(),
+          tanggal: new Date(),
+          items: keranjang,
+          total: totalHarga
+      };
+
+      const tx = db.transaction('transaksi', 'readwrite');
+      tx.objectStore('transaksi').add(transaksiBaru);
+      tx.oncomplete = () => {
+          const strukText = buatStruk(transaksiBaru);
+          console.log("ISI STRUK:", strukText); // ini nanti dikirim ke printer
+          
+          alert("Transaksi Berhasil Disimpan!");
+          keranjang = [];
+          renderKeranjang();
+          window.location.href = 'dashboard.html'; // balik ke dashboard biar grafik update
+      }
+    }
   </script>
 </body>
 </html>
