@@ -1,101 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NusaPOS Mobile - Kasir</title>
-  <style>
-    body { background: #0F2537; color: white; font-family: Arial; margin: 0; padding-bottom: 120px; }
-    .header { display:flex; justify-content:space-between; align-items:center; padding: 15px; border-bottom: 1px solid #2a3e4d; position:sticky; top:0; background:#0F2537; }
-    .produk-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; padding:15px; }
-    .produk-card { background: #1a2e3d; padding: 12px; border-radius: 12px; border: 1px solid #2a3e4d; text-align:center; }
-    .produk-card button { background:#14B3B5; color:#0F2537; border:none; padding:6px 12px; border-radius:8px; font-weight:bold; margin-top:8px; width:100% }
-    .keranjang { position:fixed; bottom:0; width:100%; background:#0a141c; border-top:1px solid #2a3e4d; padding:15px; }
-    .keranjang-item { display:flex; justify-content:space-between; font-size:12px; margin:5px 0; }
-    .btn-simpan { background: #14B3B5; color: #0F2537; font-weight: bold; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; margin-top:10px }
-    .tosca { color: #14B3B5; }
-  </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <div class="header">
-    <h1 style="font-size:16px; margin:0;">Kasir</h1>
-    <a href="dashboard.html" style="color:#14B3B5; text-decoration:none; font-size:12px">← Kembali</a>
-  </div>
-
-  <div id="produk-list" class="produk-grid">
-    <!-- Produk akan diisi dari JS -->
-  </div>
-
-  <div class="keranjang">
-    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-      <b>Keranjang</b>
-      <b class="tosca" id="total-harga">Rp 0</b>
+    <div class="container">
+        <h2>Katalog Barang</h2>
+        <div class="card">
+            <p>Daftar produk akan muncul di sini</p>
+        </div>
     </div>
-    <div id="list-keranjang">
-      <small style="color:#888">Belum ada barang</small>
-    </div>
-    <button onclick="simpanTransaksi()" class="btn-simpan">SIMPAN TRANSAKSI</button>
-  </div>
-
-  <script>
-    let keranjang = [];
-    
-    // 1. HARDCODE DULU BIAR LANGSUNG MUNCUL
-    const produk = [
-      {id:1, nama:"Nasi Goreng", harga:15000},
-      {id:2, nama:"Es Teh", harga:4000},
-      {id:3, nama:"Ayam Bakar", harga:20000},
-      {id:4, nama:"Aqua", harga:3000},
-      {id:5, nama:"Mie Goreng", harga:12000},
-      {id:6, nama:"Kopi Hitam", harga:5000},
-    ];
-
-    // 2. LANGSUNG RENDER PAS LOAD
-    document.addEventListener("DOMContentLoaded", () => {
-      const list = document.getElementById('produk-list');
-      list.innerHTML = '';
-      produk.forEach(p => {
-        list.innerHTML += `
-          <div class="produk-card">
-            <b>${p.nama}</b><br>
-            <small class="tosca">Rp ${p.harga.toLocaleString('id-ID')}</small><br>
-            <button onclick="tambahKeranjang(${p.id})">+ Tambah</button>
-          </div>
-        `;
-      });
-    });
-
-    function tambahKeranjang(id) {
-      const item = produk.find(p => p.id === id);
-      const diKeranjang = keranjang.find(k => k.id === id);
-      if(diKeranjang) diKeranjang.qty++;
-      else keranjang.push({...item, qty:1});
-      renderKeranjang();
-    }
-
-    function renderKeranjang() {
-      const list = document.getElementById('list-keranjang');
-      const total = keranjang.reduce((sum, i) => sum + i.harga * i.qty, 0);
-      document.getElementById('total-harga').innerText = `Rp ${total.toLocaleString('id-ID')}`;
-      
-      if(keranjang.length === 0) {
-        list.innerHTML = `<small style="color:#888">Belum ada barang</small>`;
-        return;
-      }
-      list.innerHTML = '';
-      keranjang.forEach(i => {
-        list.innerHTML += `<div class="keranjang-item"><span>${i.nama} x${i.qty}</span><span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div>`
-      });
-    }
-
-    function simpanTransaksi() {
-      if(keranjang.length === 0) return alert("Keranjang kosong");
-      const totalHarga = keranjang.reduce((sum, i) => sum + i.harga * i.qty, 0);
-      alert(`Transaksi Berhasil!\nTotal: Rp ${totalHarga.toLocaleString('id-ID')}`);
-      keranjang = [];
-      renderKeranjang();
-    }
-  </script>
+    <nav>
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="catalog.html" class="nav-btn">Katalog</a>
+        <a href="setting.html" class="nav-btn">Setting</a>
+    </nav>
+    <script src="app.js"></script>
 </body>
 </html>
