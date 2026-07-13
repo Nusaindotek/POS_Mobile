@@ -79,18 +79,34 @@
   </footer>
 
   <script>
-    // Sinkronisasi Tampilan Menu Berdasarkan State Settings
     document.addEventListener("DOMContentLoaded", () => {
       const kasirVisible = localStorage.getItem('modul_kasir') !== 'false';
       const katalogVisible = localStorage.getItem('modul_katalog') !== 'false';
       
       const elKasir = document.getElementById('menu-kasir');
       const elKatalog = document.getElementById('menu-katalog');
+      const menuContainer = document.getElementById('menu-container');
       
       if (!kasirVisible) elKasir.style.display = 'none';
       if (!katalogVisible) elKatalog.style.display = 'none';
       
-      if (!kasirVisible && !katalogVisible) {
+      // AMBIL DAN RENDER HALAMAN KUSTOM DARI SETTINGS
+      const customPages = JSON.parse(localStorage.getItem('custom_pages')) || [];
+      let totalMenuTampil = (kasirVisible ? 1 : 0) + (katalogVisible ? 1 : 0) + customPages.length;
+
+      customPages.forEach(page => {
+        const customBtn = document.createElement('a');
+        customBtn.href = page.url;
+        customBtn.className = "bg-gray-900/40 p-4 rounded-2xl border border-gray-800 active:scale-95 transition flex flex-col items-center justify-center space-y-2 text-center shadow-md border-nusatosca/20";
+        customBtn.innerHTML = `
+          <span class="text-3xl">${page.icon}</span>
+          <span class="text-xs font-bold text-gray-200 tracking-wide">${page.name}</span>
+          <span class="text-[9px] bg-nusatosca/20 text-nusatosca px-1.5 py-0.5 rounded-full font-bold">Kustom</span>
+        `;
+        menuContainer.appendChild(customBtn);
+      });
+
+      if (totalMenuTampil === 0) {
         document.getElementById('empty-message').classList.remove('hidden');
       }
     });
