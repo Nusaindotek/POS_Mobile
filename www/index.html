@@ -1,18 +1,38 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NusaPOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
         <h2>Dashboard</h2>
-        <div class="card"><h3>Omset Hari Ini: Rp 0</h3></div>
+        
+        <div class="card">
+            <h3 style="margin: 0; color: #0ea5e9;">Omset Hari Ini</h3>
+            <p style="font-size: 24px; font-weight: bold; margin: 10px 0;">Rp 0</p>
+            <p style="color: #64748b; font-size: 14px;">Total Transaksi: 0</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <a href="index.html" style="text-decoration: none;">
+                <button style="background: #334155;">Mesin Kasir</button>
+            </a>
+            <a href="catalog.html" style="text-decoration: none;">
+                <button style="background: #334155;">Katalog</button>
+            </a>
+        </div>
     </div>
+
     <nav>
-        <a href="index.html" class="nav-btn">Home</a>
-        <a href="catalog.html" class="nav-btn">Katalog</a>
-        <a href="setting.html" class="nav-btn">Setting</a>
+        <a href="index.html" class="nav-item">Dashboard</a>
+        <a href="report.html" class="nav-item">Laporan</a>
+        <a href="setting.html" class="nav-item">Setting</a>
     </nav>
+
     <script src="app.js"></script>
 </body>
 </html>
