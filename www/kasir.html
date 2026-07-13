@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesin Kasir - NusaPOS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Mesin Kasir</h2>
+        
+        <h3>Pilih Produk</h3>
+        <div id="gridProduk" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>Keranjang</h3>
+            <div id="keranjangList"></div>
+            <hr>
+            <p><strong>Total: Rp <span id="totalHarga">0</span></strong></p>
+            <button onclick="simpanTransaksi()" style="background: #28a745;">SIMPAN TRANSAKSI</button>
+        </div>
+    </div>
+
+    <nav>
+        <a href="index.html" class="nav-item">Dashboard</a>
+        <a href="catalog.html" class="nav-item">Katalog</a>
+        <a href="setting.html" class="nav-item">Setting</a>
+    </nav>
+
+    <script src="app.js"></script>
+    <script>
+        let keranjang = [];
+        let total = 0;
+
+        function tambahKeKeranjang(nama, harga) {
+            keranjang.push({nama, harga});
+            total += parseInt(harga);
+            document.getElementById('totalHarga').innerText = total;
+            document.getElementById('keranjangList').innerHTML += `<div>${nama} - Rp ${harga}</div>`;
+        }
+
+        function simpanTransaksi() {
+            if(keranjang.length === 0) return alert("Keranjang kosong!");
+            let transaksi = ambilDariLocalStorage('transaksi') || [];
+            transaksi.push({ items: keranjang, total: total, tanggal: new Date().toLocaleString() });
+            simpanKeLocalStorage('transaksi', transaksi);
+            alert("Transaksi Berhasil!");
+            location.reload();
+        }
+
+        window.onload = () => {
+            const daftar = ambilDariLocalStorage('daftarBarang') || [];
+            const grid = document.getElementById('gridProduk');
+            grid.innerHTML = daftar.map(b => `
+                <div class="card" style="text-align:center;">
+                    <strong>${b.nama}</strong><br>Rp ${b.harga}<br>
+                    <button onclick="tambahKeKeranjang('${b.nama}', ${b.harga})">+ Tambah</button>
+                </div>
+            `).join('');
+        };
+    </script>
+</body>
+</html>
