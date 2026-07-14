@@ -3,140 +3,44 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14B3B5">
 <style>
-body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 70px 0}
-.header{display:flex; align-items:center; justify-content:space-between; padding:16px;}
-.header-left{display:flex; align-items:center; gap:12px}
-.header img{width:40px; height:40px; border-radius:8px; object-fit:cover} /* DIKECILIN JADI 40PX */
-.header b{font-size:16px} /* DIKECILIN JUGA */
-.header small{color:#14B3B5; font-size:12px}
-.waktu{color:#14B3B5; font-weight:bold}
-.card{background:#1a2e3d; margin:12px; padding:16px; border-radius:12px}
-.card-flex{display:flex; justify-content:space-between}
-.tosca{color:#14B3B5; font-size:24px; font-weight:bold}
-.card-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
-.badge-live{background:rgba(20,179,181,0.2); color:#14B3B5; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:bold}
-.menu-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:0 12px}
-.menu-card{background:#1a2e3d; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:white}
-.badge{background:green; padding:4px 10px; border-radius:20px; font-size:11px}
-canvas{background:transparent; width:100% !important; height:220px !important}
-.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #2a3e4d}
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.card-mini{text-align:center; padding:16px}
+.card-mini b{font-size:20px; color:#14B3B5}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
 .bottom-nav a.active{color:#14B3B5}
 </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
-      <img id="logo-dashboard" src="https://via.placeholder.com/40/14B3B5/0F2537?text=N"> <!-- ADA ID -->
-      <div>
-        <b id="nama-dashboard">NusaPOS</b><br> <!-- ADA ID + DIKECILIN -->
-        <small>Status: Premium Beta</small>
-      </div>
-    </div>
-    <div class="waktu" id="jam">15.02</div>
-  </div>
-
+  <div class="header">Dashboard</div>
   <div class="card">
-    <div class="card-flex">
-      <div>
-        <div style="color:#888; font-size:13px">OMSET HARI INI</div>
-        <div class="tosca" id="omset-hari-ini">Rp 0</div>
-      </div>
-      <div style="text-align:right">
-        <div style="color:#888; font-size:13px">TRANSAKSI</div>
-        <div style="font-size:24px; font-weight:bold" id="transaksi-hari-ini">0</div>
-      </div>
+    <b>Penjualan Hari Ini</b>
+    <div class="grid" style="margin-top:10px">
+      <div class="card-mini"><b id="totalTransaksi">0</b><br>Transaksi</div>
+      <div class="card-mini"><b id="totalPendapatan">Rp 0</b><br>Pendapatan</div>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-header">
-      <b>STATISTIK JUALAN (7 HARI TERAKHIR)</b>
-      <span class="badge-live">Grafik Live</span>
-    </div>
-    <canvas id="grafik"></canvas>
-  </div>
-
-  <div style="padding:0 12px; margin:12px 0; color:#888">AKSES HALAMAN TOKO</div>
-  <div class="menu-grid">
-    <a href="catalog.html" class="menu-card">🛒<br><b>Mesin Kasir</b><br><span class="badge">Aktif</span></a>
-    <a href="katalog.html" class="menu-card">📦<br><b>Katalog Barang</b><br><span class="badge">Aktif</span></a>
-  </div>
-
   <div class="bottom-nav">
-    <a href="dashboard.html" class="active"><div>📊</div>DASHBOARD</a>
-    <a href="setting.html"><div>⚙️</div>SETTINGS</a>
+    <a href="dashboard.html" class="active"><div>🏠</div>Dashboard</a>
+    <a href="catalog.html"><div>🧾</div>Kasir</a>
+    <a href="report.html"><div>📊</div>Laporan</a>
+    <a href="setting.html"><div>🏪</div>Info Toko</a>
   </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// 0. LOAD NAMA TOKO & LOGO DARI SETTING
-document.getElementById('nama-dashboard').innerText = localStorage.getItem('namaToko') || 'NusaPOS';
-document.getElementById('logo-dashboard').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/40/14B3B5/0F2537?text=N';
-
-// Update jam real time
-setInterval(()=>{
-  document.getElementById('jam').innerText = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-}, 1000)
-
-const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
-const hariIni = new Date().toLocaleDateString('id-ID');
-
-// 1. HITUNG OMSET & TRANSAKSI HARI INI
-const transaksiHariIni = riwayat.filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === hariIni);
-const omsetHariIni = transaksiHariIni.reduce((sum, t) => sum + t.total, 0);
-document.getElementById('omset-hari-ini').innerText = `Rp ${omsetHariIni.toLocaleString('id-ID')}`;
-document.getElementById('transaksi-hari-ini').innerText = transaksiHariIni.length;
-
-// 2. BUAT DATA 7 HARI TERAKHIR UNTUK GRAFIK BATANG
-const labels = [];
-const dataOmset = [];
-for(let i=6; i>=0; i--){
-  const d = new Date();
-  d.setDate(d.getDate() - i);
-  const tgl = d.toLocaleDateString('id-ID');
-  labels.push(d.toLocaleDateString('id-ID', {weekday: 'short'})); // Sen, Sel
-
-  const omset = riwayat
-    .filter(t => new Date(t.tanggal).toLocaleDateString('id-ID') === tgl)
-    .reduce((sum, t) => sum + t.total, 0);
-  dataOmset.push(omset);
+window.onload = function(){
+  const transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
+  const hariIni = transaksi.filter(t => new Date(t.tanggal).toDateString() === new Date().toDateString());
+  document.getElementById('totalTransaksi').innerText = hariIni.length;
+  const total = hariIni.reduce((sum, t) => sum + t.total, 0);
+  document.getElementById('totalPendapatan').innerText = 'Rp ' + total.toLocaleString('id-ID');
 }
-
-// 3. GAMBAR GRAFIK BATANG
-const ctx = document.getElementById('grafik');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: 'Omset',
-      data: dataOmset,
-      backgroundColor: '#14B3B5',
-      borderRadius: 8,
-      barThickness: 25
-    }]
-  },
-  options: {
-    plugins: {legend: {display: false}},
-    scales: {
-      y: {
-        ticks: {
-          color: '#888',
-          callback: function(value) { return 'Rp ' + (value/1000) + 'k' }
-        }, 
-        grid: {color: 'rgba(255,255,255,0.1)'}
-      },
-      x: {
-        ticks: {color: '#888'}, 
-        grid: {display: false}
-      }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-})
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
 </html>
