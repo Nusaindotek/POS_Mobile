@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Info Toko</title>
-<link rel="manifest" href="manifest.json"> <!-- TAMBAH INI -->
-<meta name="theme-color" content="#14B3B5"> <!-- TAMBAH INI -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14B3B5">
 <style>
 *{box-sizing:border-box}
-body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 90px 0} /* padding bawah ditambah biar gak ketutup navbar */
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 90px 0}
 .header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between; align-items:center}
 .card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
 .toko-header{display:flex; align-items:center; gap:16px}
@@ -22,7 +22,6 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 90
 .list-item button{background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:12px}
 .kontak-wa{display:flex; align-items:center; gap:12px; background:#E8F8F9; padding:16px; border-radius:12px; text-decoration:none; color:#333}
 
-/* NAVBAR RAPI */
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; height:65px; background:white; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ddd; padding-bottom: env(safe-area-inset-bottom)}
 .nav-item{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1; padding:5px 0}
 .nav-item.active{color:#14B3B5; font-weight:600}
@@ -57,8 +56,16 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 90
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
 
-  <!-- CARD: RESTOCK PRODUK DARI KATALOG -->
+  <!-- CARD: KELOLA PRODUK PINDAH KE SINI -->
   <div class="card">
+    <b>Tambah Produk Baru</b>
+    <input class="input" id="namaProduk" placeholder="Nama Produk">
+    <input class="input" id="hargaProduk" type="number" placeholder="Harga">
+    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal">
+    <input class="input" id="kategoriProduk" placeholder="Kategori: Makanan, Minuman">
+    <button onclick="tambahProduk()" class="btn-simpan">TAMBAH PRODUK</button>
+    <hr style="margin:16px 0; border:none; border-top:1px solid #eee">
+
     <b>Restock Produk</b>
     <small style="color:#888">Pilih produk dari katalog untuk menambah stok</small>
     <select class="input" id="pilihProdukRestock" style="margin-top:8px"></select>
@@ -83,26 +90,14 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 90
   </div>
 
   <div class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
-      <div class="nav-icon">🏠</div>
-      <div>Dashboard</div>
-    </a>
-    <a href="catalog.html" class="nav-item">
-      <div class="nav-icon">🧾</div>
-      <div>Kasir</div>
-    </a>
-    <a href="report.html" class="nav-item">
-      <div class="nav-icon">📊</div>
-      <div>Laporan</div>
-    </a>
-    <a href="setting.html" class="nav-item active">
-      <div class="nav-icon">🏪</div>
-      <div>Info Toko</div>
-    </a>
+    <a href="dashboard.html" class="nav-item"><div class="nav-icon">🏠</div><div>Dashboard</div></a>
+    <a href="catalog.html" class="nav-item"><div class="nav-icon">🧾</div><div>Kasir</div></a>
+    <a href="report.html" class="nav-item"><div class="nav-icon">📊</div><div>Laporan</div></a>
+    <a href="setting.html" class="nav-item active"><div class="nav-icon">🏪</div><div>Info Toko</div></a>
   </div>
 
 <script>
-let produk = JSON.parse(localStorage.getItem('produk')) || JSON.parse(localStorage.getItem('products')) || []; // BACA 2 KEY BIAR NYAMBUNG
+let produk = JSON.parse(localStorage.getItem('produk')) || JSON.parse(localStorage.getItem('products')) || [];
 let kategori = JSON.parse(localStorage.getItem('kategori')) || [];
 
 window.onload = function(){
@@ -140,6 +135,31 @@ function simpanInfo(){
   alert('Info Toko Tersimpan!');
 }
 
+function simpanProdukKeStorage(){
+  localStorage.setItem('produk',JSON.stringify(produk));
+  localStorage.setItem('products',JSON.stringify(produk));
+}
+
+function tambahProduk(){
+  const nama = document.getElementById('namaProduk').value;
+  const harga = parseInt(document.getElementById('hargaProduk').value);
+  const stok = parseInt(document.getElementById('stokProduk').value);
+  const kategori = document.getElementById('kategoriProduk').value || "Umum";
+
+  if(!nama ||!harga || stok < 0) return alert("Nama, Harga, Stok wajib diisi");
+
+  const produkBaru = { id: Date.now(), nama: nama, harga: harga, stok: stok, kategori: kategori }
+
+  produk.push(produkBaru);
+  simpanProdukKeStorage();
+  renderProduk();
+  document.getElementById('namaProduk').value = '';
+  document.getElementById('hargaProduk').value = '';
+  document.getElementById('stokProduk').value = '';
+  document.getElementById('kategoriProduk').value = '';
+  alert("Produk berhasil ditambahkan!");
+}
+
 function pilihPrinter(){
   if(typeof bluetoothSerial === 'undefined'){ alert("Fitur ini hanya jalan di APK Android"); return; }
   bluetoothSerial.list(
@@ -165,19 +185,13 @@ function pilihPrinter(){
   );
 }
 
-function simpanProdukKeStorage(){ // FUNGSI BARU BIAR SIMPAN KE 2 KEY
-  localStorage.setItem('produk',JSON.stringify(produk));
-  localStorage.setItem('products',JSON.stringify(produk));
-}
-
-// PRODUK + RESTOCK DARI KATALOG
 function renderProduk(){
   const list = document.getElementById('listProduk');
   const selectRestock = document.getElementById('pilihProdukRestock');
   list.innerHTML=''; selectRestock.innerHTML='';
 
   if(produk.length === 0){
-    list.innerHTML = '<small style="color:#888">Belum ada produk di katalog. Tambah dulu di halaman Katalog</small>';
+    list.innerHTML = '<small style="color:#888">Belum ada produk. Tambah dulu di atas</small>';
     selectRestock.innerHTML = '<option>Belum ada produk</option>';
     return;
   }
@@ -192,12 +206,11 @@ function renderProduk(){
 function hapusProduk(i){
   if(confirm(`Hapus produk ${produk[i].nama}?`)){
     produk.splice(i,1);
-    simpanProdukKeStorage(); // PAKE FUNGSI BARU
+    simpanProdukKeStorage();
     renderProduk();
   }
 }
 
-// FUNGSI RESTOCK
 function restockProduk(){
   const idProduk = parseInt(document.getElementById('pilihProdukRestock').value);
   const jumlahTambah = parseInt(document.getElementById('tambahStok').value);
@@ -209,14 +222,13 @@ function restockProduk(){
   const indexProduk = produk.findIndex(p => p.id === idProduk);
   if(indexProduk!== -1){
     produk[indexProduk].stok += jumlahTambah;
-    simpanProdukKeStorage(); // PAKE FUNGSI BARU
+    simpanProdukKeStorage();
     document.getElementById('tambahStok').value='';
     renderProduk();
     alert(`Stok ${produk[indexProduk].nama} berhasil ditambah ${jumlahTambah}`);
   }
 }
 
-// BACKUP RESTORE
 function backupData(){
   const data = {produk:produk, kategori:kategori, namaToko:localStorage.getItem('namaToko'), alamatToko:localStorage.getItem('alamatToko'), noHp:localStorage.getItem('noHp'), footer:localStorage.getItem('footer'), ukuranKertas:localStorage.getItem('ukuranKertas')};
   const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
@@ -228,7 +240,7 @@ function restoreData(e){
   reader.onload = function(event){
     const data = JSON.parse(event.target.result);
     localStorage.setItem('produk',JSON.stringify(data.produk));
-    localStorage.setItem('products',JSON.stringify(data.produk)); // SIMPAN 2 KEY
+    localStorage.setItem('products',JSON.stringify(data.produk));
     localStorage.setItem('kategori',JSON.stringify(data.kategori));
     localStorage.setItem('namaToko',data.namaToko);
     localStorage.setItem('alamatToko',data.alamatToko);
@@ -240,7 +252,6 @@ function restoreData(e){
   reader.readAsText(file);
 }
 
-// PWA SERVICE WORKER
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js');
 }
