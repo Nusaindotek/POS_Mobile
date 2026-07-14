@@ -51,23 +51,18 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
 
-  <div class="card">
-    <b>Kelola Kategori</b>
-    <div style="display:flex; gap:8px; margin-top:8px">
-      <input class="input" id="inputKategori" placeholder="Nama Kategori Baru" style="margin:0">
-      <button onclick="tambahKategori()" class="btn-simpan" style="width:auto; padding:14px 20px; margin:0">+</button>
-    </div>
-    <div id="listKategori" style="margin-top:10px"></div>
-  </div>
+  <!-- KELOLA KATEGORI UDAH DIHAPUS DARI SINI -->
 
+  <!-- CARD: RESTOCK PRODUK DARI KATALOG -->
   <div class="card">
-    <b>Kelola Produk</b>
-    <input class="input" id="namaProduk" placeholder="Nama Produk">
-    <input class="input" id="hargaProduk" type="number" placeholder="Harga">
-    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal">
-    <select class="input" id="kategoriProduk"></select> <!-- INI KOTAK BAWAHNYA -->
-    <button onclick="tambahProduk()" class="btn-simpan">TAMBAH PRODUK</button>
-    <div id="listProduk" style="margin-top:10px"></div> <!-- INI DAFTAR PRODUKNYA -->
+    <b>Restock Produk</b>
+    <small style="color:#888">Pilih produk dari katalog untuk menambah stok</small>
+    <select class="input" id="pilihProdukRestock" style="margin-top:8px"></select>
+    <input class="input" id="tambahStok" type="number" placeholder="Jumlah Stok yang Ditambahkan">
+    <button onclick="restockProduk()" class="btn-simpan" style="background:#ff9800">TAMBAH STOK</button>
+
+    <b style="display:block; margin-top:16px">Daftar Produk di Katalog</b>
+    <div id="listProduk" style="margin-top:10px"></div>
   </div>
 
   <div class="card">
@@ -92,9 +87,8 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
 
 <script>
 let produk = JSON.parse(localStorage.getItem('produk')) || [];
-let kategori = JSON.parse(localStorage.getItem('kategori')) || ["Makanan","Minuman","Snack"];
+let kategori = JSON.parse(localStorage.getItem('kategori')) || []; // TETAP LOAD BIAR DROPDOWN RESTOCK BISA
 
-// FIX: LOAD KATEGORI DULU BARU PRODUK
 window.onload = function(){
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
   document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
@@ -104,12 +98,9 @@ window.onload = function(){
   document.getElementById('logo-preview').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/70/F5F7FA/888?text=🏪';
   document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
   document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
-
   const nama = localStorage.getItem('printerName');
   if(nama){ document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`; }
-
-  renderKategori(); // 1. RENDER KATEGORI DULU
-  renderProduk(); // 2. BARU RENDER PRODUK
+  renderProduk(); // LANGSUNG TAMPILIN PRODUK
 }
 
 document.getElementById('uploadLogo').addEventListener('change', function(e){
@@ -158,54 +149,51 @@ function pilihPrinter(){
   );
 }
 
-// KATEGORI
-function renderKategori(){
-  const list = document.getElementById('listKategori');
-  const select = document.getElementById('kategoriProduk');
-  list.innerHTML = ''; select.innerHTML = '';
-  if(kategori.length === 0){ select.innerHTML = '<option>Buat kategori dulu</option>' }
-  kategori.forEach((k,i)=>{
-    list.innerHTML += `<div class="list-item"><span>${k}</span><button onclick="hapusKategori(${i})">Hapus</button></div>`;
-    select.innerHTML += `<option value="${k}">${k}</option>`; // ISI DROPDOWN
-  })
-}
-function tambahKategori(){
-  const input = document.getElementById('inputKategori').value;
-  if(input){
-    kategori.push(input);
-    localStorage.setItem('kategori',JSON.stringify(kategori));
-    document.getElementById('inputKategori').value='';
-    renderKategori(); // RENDER ULANG BIAR DROPDOWN KEUPDATE
-  }
-}
-function hapusKategori(i){ kategori.splice(i,1); localStorage.setItem('kategori',JSON.stringify(kategori)); renderKategori(); renderProduk(); }
-
-// PRODUK + STOK
+// PRODUK + RESTOCK DARI KATALOG
 function renderProduk(){
-  const list = document.getElementById('listProduk'); list.innerHTML='';
-  if(produk.length === 0){ list.innerHTML = '<small style="color:#888">Belum ada produk</small>'}
+  const list = document.getElementById('listProduk');
+  const selectRestock = document.getElementById('pilihProdukRestock');
+  list.innerHTML=''; selectRestock.innerHTML='';
+
+  if(produk.length === 0){
+    list.innerHTML = '<small style="color:#888">Belum ada produk di katalog. Tambah dulu di halaman Katalog</small>';
+    selectRestock.innerHTML = '<option>Belum ada produk</option>';
+    return;
+  }
+
   produk.forEach((p,i)=>{
-    const stok = p.stok!== undefined? ` | Stok: ${p.stok}` : '';
-    list.innerHTML += `<div class="list-item"><span>${p.nama} - Rp ${p.harga.toLocaleString('id-ID')}${stok}</span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
+    const stok = p.stok!== undefined? `Stok: ${p.stok}` : 'Stok: 0';
+    list.innerHTML += `<div class="list-item"><span><b>${p.nama}</b><br><small>Rp ${p.harga.toLocaleString('id-ID')} | ${p.kategori} | ${stok}</small></span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
+    selectRestock.innerHTML += `<option value="${p.id}">${p.nama} - ${stok}</option>`;
   })
 }
-function tambahProduk(){
-  const nama = document.getElementById('namaProduk').value;
-  const harga = parseInt(document.getElementById('hargaProduk').value);
-  const stok = parseInt(document.getElementById('stokProduk').value) || 0;
-  const kat = document.getElementById('kategoriProduk').value;
-  if(nama && harga >= 0 && kat){
-    produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat, stok:stok});
+
+function hapusProduk(i){
+  if(confirm(`Hapus produk ${produk[i].nama}?`)){
+    produk.splice(i,1);
     localStorage.setItem('produk',JSON.stringify(produk));
-    document.getElementById('namaProduk').value='';
-    document.getElementById('hargaProduk').value='';
-    document.getElementById('stokProduk').value='';
-    renderProduk(); // RENDER ULANG BIAR LANGSUNG MUNCUL
-  } else {
-    alert("Nama, Harga, dan Kategori wajib diisi")
+    renderProduk();
   }
 }
-function hapusProduk(i){ produk.splice(i,1); localStorage.setItem('produk',JSON.stringify(produk)); renderProduk(); }
+
+// FUNGSI RESTOCK
+function restockProduk(){
+  const idProduk = parseInt(document.getElementById('pilihProdukRestock').value);
+  const jumlahTambah = parseInt(document.getElementById('tambahStok').value);
+
+  if(!idProduk ||!jumlahTambah || jumlahTambah <= 0){
+    return alert("Pilih produk dan isi jumlah stok yang benar");
+  }
+
+  const indexProduk = produk.findIndex(p => p.id === idProduk);
+  if(indexProduk!== -1){
+    produk[indexProduk].stok += jumlahTambah;
+    localStorage.setItem('produk',JSON.stringify(produk));
+    document.getElementById('tambahStok').value='';
+    renderProduk();
+    alert(`Stok ${produk[indexProduk].nama} berhasil ditambah ${jumlahTambah}`);
+  }
+}
 
 // BACKUP RESTORE
 function backupData(){
