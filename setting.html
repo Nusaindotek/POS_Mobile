@@ -13,7 +13,10 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
 .btn-logo{background:transparent; color:#14B3B5; border:2px solid #14B3B5; padding:10px 20px; border-radius:25px; font-weight:bold; cursor:pointer}
 .input{width:100%; padding:14px; margin:8px 0; border:1px solid #ddd; border-radius:10px; box-sizing:border-box; font-size:15px}
 .btn-simpan{background:#14B3B5; color:white; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px}
+.btn-abu{background:#F5F7FA; color:#333; width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; font-size:14px; margin-top:6px}
 .btn-printer{width:100%; padding:14px; background:#F5F7FA; color:#14B3B5; border:2px dashed #14B3B5; border-radius:10px; font-size:15px; font-weight:bold; margin-top:8px}
+.list-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px}
+.list-item button{background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:12px}
 .kontak-wa{display:flex; align-items:center; gap:12px; background:#E8F8F9; padding:16px; border-radius:12px; text-decoration:none; color:#333}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
@@ -46,7 +49,6 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
       <option>80 mm</option>
     </select>
 
-    <!-- FITUR BARU: PAIRING PRINTER BLUETOOTH -->
     <b>Pengaturan Printer</b>
     <button class="btn-printer" onclick="pilihPrinter()">🔵 Pilih Printer Bluetooth</button>
     <small id="status-printer" style="color:#888; display:block; margin-top:6px">Belum ada printer dipilih</small>
@@ -54,6 +56,35 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
 
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
+  </div>
+
+  <!-- KARTU BARU: KELOLA KATEGORI -->
+  <div class="card">
+    <b>Kelola Kategori</b>
+    <div style="display:flex; gap:8px; margin-top:8px">
+      <input class="input" id="inputKategori" placeholder="Nama Kategori Baru" style="margin:0">
+      <button onclick="tambahKategori()" class="btn-simpan" style="width:auto; padding:14px 20px; margin:0">+</button>
+    </div>
+    <div id="listKategori" style="margin-top:10px"></div>
+  </div>
+
+  <!-- KARTU BARU: KELOLA PRODUK + STOK -->
+  <div class="card">
+    <b>Kelola Produk</b>
+    <input class="input" id="namaProduk" placeholder="Nama Produk">
+    <input class="input" id="hargaProduk" type="number" placeholder="Harga">
+    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal"> <!-- INPUT STOK BARU -->
+    <select class="input" id="kategoriProduk"></select>
+    <button onclick="tambahProduk()" class="btn-simpan">TAMBAH PRODUK</button>
+    <div id="listProduk" style="margin-top:10px"></div>
+  </div>
+
+  <!-- KARTU BARU: BACKUP -->
+  <div class="card">
+    <b>Backup & Restore</b>
+    <button onclick="backupData()" class="btn-abu">EXPORT DATA</button>
+    <input type="file" id="fileRestore" onchange="restoreData(event)" style="display:none">
+    <button onclick="document.getElementById('fileRestore').click()" class="btn-abu">IMPORT DATA</button>
   </div>
 
   <div class="card">
@@ -70,6 +101,9 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
   </div>
 
 <script>
+let produk = JSON.parse(localStorage.getItem('produk')) || [];
+let kategori = JSON.parse(localStorage.getItem('kategori')) || ["Makanan","Minuman","Snack"];
+
 // LOAD DATA SAAT BUKA HALAMAN
 window.onload = function(){
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
@@ -81,12 +115,11 @@ window.onload = function(){
   document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
   document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
 
-  // CEK STATUS PRINTER
   const nama = localStorage.getItem('printerName');
   if(nama){
-    document.getElementById('btn-printer-setting').innerText = `✅ ${nama}`;
     document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`;
   }
+  renderKategori(); renderProduk();
 }
 
 // Fitur upload logo
@@ -112,16 +145,15 @@ function simpanInfo(){
   alert('Info Toko Tersimpan!');
 }
 
-// FUNGSI BARU: PILIH PRINTER BLUETOOTH
+// PRINTER
 function pilihPrinter(){
   if(typeof bluetoothSerial === 'undefined'){
-    alert("Fitur ini hanya jalan di APK Android. Di PWA tidak bisa");
+    alert("Fitur ini hanya jalan di APK Android");
     return;
   }
-
   bluetoothSerial.list(
     function(devices){
-      if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan. Nyalakan bluetooth dulu");
+      if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan");
       let list = "Pilih Printer:\n";
       devices.forEach((d,i)=> list += `${i+1}. ${d.name}\n`);
       let pilih = prompt(list + "\nKetik nomor printer:");
@@ -131,7 +163,6 @@ function pilihPrinter(){
           function(){
             localStorage.setItem('printerAddress', device.address);
             localStorage.setItem('printerName', device.name);
-            document.getElementById('btn-printer-setting').innerText = `✅ ${device.name}`;
             document.getElementById('status-printer').innerText = `Terhubung ke ${device.name}`;
             alert("Printer berhasil disimpan");
           },
@@ -141,6 +172,69 @@ function pilihPrinter(){
     },
     function(){ alert("Bluetooth mati") }
   );
+}
+
+// KATEGORI
+function renderKategori(){
+  const list = document.getElementById('listKategori');
+  const select = document.getElementById('kategoriProduk');
+  list.innerHTML = ''; select.innerHTML = '';
+  kategori.forEach((k,i)=>{
+    list.innerHTML += `<div class="list-item"><span>${k}</span><button onclick="hapusKategori(${i})">Hapus</button></div>`;
+    select.innerHTML += `<option value="${k}">${k}</option>`;
+  })
+}
+function tambahKategori(){
+  const input = document.getElementById('inputKategori').value;
+  if(input){ kategori.push(input); localStorage.setItem('kategori',JSON.stringify(kategori)); document.getElementById('inputKategori').value=''; renderKategori(); }
+}
+function hapusKategori(i){ kategori.splice(i,1); localStorage.setItem('kategori',JSON.stringify(kategori)); renderKategori(); }
+
+// PRODUK + STOK
+function renderProduk(){
+  const list = document.getElementById('listProduk'); list.innerHTML='';
+  produk.forEach((p,i)=>{
+    const stok = p.stok!== undefined? ` | Stok: ${p.stok}` : '';
+    list.innerHTML += `<div class="list-item"><span>${p.nama} - Rp ${p.harga.toLocaleString('id-ID')}${stok}</span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
+  })
+}
+function tambahProduk(){
+  const nama = document.getElementById('namaProduk').value;
+  const harga = parseInt(document.getElementById('hargaProduk').value);
+  const stok = parseInt(document.getElementById('stokProduk').value) || 0; // AMBIL STOK
+  const kat = document.getElementById('kategoriProduk').value;
+  if(nama && harga >= 0){
+    produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat, stok:stok}); // SIMPAN STOK
+    localStorage.setItem('produk',JSON.stringify(produk));
+    document.getElementById('namaProduk').value='';
+    document.getElementById('hargaProduk').value='';
+    document.getElementById('stokProduk').value='';
+    renderProduk();
+  }
+}
+function hapusProduk(i){ produk.splice(i,1); localStorage.setItem('produk',JSON.stringify(produk)); renderProduk(); }
+
+// BACKUP RESTORE
+function backupData(){
+  const data = {produk:produk, kategori:kategori, namaToko:localStorage.getItem('namaToko'), alamatToko:localStorage.getItem('alamatToko'), noHp:localStorage.getItem('noHp'), footer:localStorage.getItem('footer'), ukuranKertas:localStorage.getItem('ukuranKertas')};
+  const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='backup-nusapos.json'; a.click();
+}
+function restoreData(e){
+  const file = e.target.files[0]; const reader = new FileReader();
+  reader.onload = function(event){
+    const data = JSON.parse(event.target.result);
+    localStorage.setItem('produk',JSON.stringify(data.produk));
+    localStorage.setItem('kategori',JSON.stringify(data.kategori));
+    localStorage.setItem('namaToko',data.namaToko);
+    localStorage.setItem('alamatToko',data.alamatToko);
+    localStorage.setItem('noHp',data.noHp);
+    localStorage.setItem('footer',data.footer);
+    localStorage.setItem('ukuranKertas',data.ukuranKertas);
+    location.reload();
+  }
+  reader.readAsText(file);
 }
 </script>
 </body>
