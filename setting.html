@@ -43,22 +43,14 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <input class="input" id="namaToko" placeholder="🏪 Nama Toko">
     <input class="input" id="alamatToko" placeholder="📍 Alamat">
     <input class="input" id="noHp" placeholder="📞 Nomor HP">
-
-    <select class="input" id="ukuranKertas">
-      <option>58 mm</option>
-      <option>80 mm</option>
-    </select>
-
+    <select class="input" id="ukuranKertas"><option>58 mm</option><option>80 mm</option></select>
     <b>Pengaturan Printer</b>
     <button class="btn-printer" onclick="pilihPrinter()">🔵 Pilih Printer Bluetooth</button>
     <small id="status-printer" style="color:#888; display:block; margin-top:6px">Belum ada printer dipilih</small>
-
     <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
-
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
 
-  <!-- KARTU BARU: KELOLA KATEGORI -->
   <div class="card">
     <b>Kelola Kategori</b>
     <div style="display:flex; gap:8px; margin-top:8px">
@@ -68,18 +60,16 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <div id="listKategori" style="margin-top:10px"></div>
   </div>
 
-  <!-- KARTU BARU: KELOLA PRODUK + STOK -->
   <div class="card">
     <b>Kelola Produk</b>
     <input class="input" id="namaProduk" placeholder="Nama Produk">
     <input class="input" id="hargaProduk" type="number" placeholder="Harga">
-    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal"> <!-- INPUT STOK BARU -->
-    <select class="input" id="kategoriProduk"></select>
+    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal">
+    <select class="input" id="kategoriProduk"></select> <!-- INI KOTAK BAWAHNYA -->
     <button onclick="tambahProduk()" class="btn-simpan">TAMBAH PRODUK</button>
-    <div id="listProduk" style="margin-top:10px"></div>
+    <div id="listProduk" style="margin-top:10px"></div> <!-- INI DAFTAR PRODUKNYA -->
   </div>
 
-  <!-- KARTU BARU: BACKUP -->
   <div class="card">
     <b>Backup & Restore</b>
     <button onclick="backupData()" class="btn-abu">EXPORT DATA</button>
@@ -104,7 +94,7 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
 let produk = JSON.parse(localStorage.getItem('produk')) || [];
 let kategori = JSON.parse(localStorage.getItem('kategori')) || ["Makanan","Minuman","Snack"];
 
-// LOAD DATA SAAT BUKA HALAMAN
+// FIX: LOAD KATEGORI DULU BARU PRODUK
 window.onload = function(){
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
   document.getElementById('alamatToko').value = localStorage.getItem('alamatToko') || '';
@@ -116,13 +106,12 @@ window.onload = function(){
   document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
 
   const nama = localStorage.getItem('printerName');
-  if(nama){
-    document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`;
-  }
-  renderKategori(); renderProduk();
+  if(nama){ document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`; }
+
+  renderKategori(); // 1. RENDER KATEGORI DULU
+  renderProduk(); // 2. BARU RENDER PRODUK
 }
 
-// Fitur upload logo
 document.getElementById('uploadLogo').addEventListener('change', function(e){
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -139,18 +128,13 @@ function simpanInfo(){
   localStorage.setItem('noHp', document.getElementById('noHp').value);
   localStorage.setItem('ukuranKertas', document.getElementById('ukuranKertas').value);
   localStorage.setItem('footer', document.getElementById('footer').value);
-
   document.getElementById('nama-toko-view').innerText = document.getElementById('namaToko').value;
   document.getElementById('alamat-view').innerText = document.getElementById('alamatToko').value;
   alert('Info Toko Tersimpan!');
 }
 
-// PRINTER
 function pilihPrinter(){
-  if(typeof bluetoothSerial === 'undefined'){
-    alert("Fitur ini hanya jalan di APK Android");
-    return;
-  }
+  if(typeof bluetoothSerial === 'undefined'){ alert("Fitur ini hanya jalan di APK Android"); return; }
   bluetoothSerial.list(
     function(devices){
       if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan");
@@ -179,20 +163,27 @@ function renderKategori(){
   const list = document.getElementById('listKategori');
   const select = document.getElementById('kategoriProduk');
   list.innerHTML = ''; select.innerHTML = '';
+  if(kategori.length === 0){ select.innerHTML = '<option>Buat kategori dulu</option>' }
   kategori.forEach((k,i)=>{
     list.innerHTML += `<div class="list-item"><span>${k}</span><button onclick="hapusKategori(${i})">Hapus</button></div>`;
-    select.innerHTML += `<option value="${k}">${k}</option>`;
+    select.innerHTML += `<option value="${k}">${k}</option>`; // ISI DROPDOWN
   })
 }
 function tambahKategori(){
   const input = document.getElementById('inputKategori').value;
-  if(input){ kategori.push(input); localStorage.setItem('kategori',JSON.stringify(kategori)); document.getElementById('inputKategori').value=''; renderKategori(); }
+  if(input){
+    kategori.push(input);
+    localStorage.setItem('kategori',JSON.stringify(kategori));
+    document.getElementById('inputKategori').value='';
+    renderKategori(); // RENDER ULANG BIAR DROPDOWN KEUPDATE
+  }
 }
-function hapusKategori(i){ kategori.splice(i,1); localStorage.setItem('kategori',JSON.stringify(kategori)); renderKategori(); }
+function hapusKategori(i){ kategori.splice(i,1); localStorage.setItem('kategori',JSON.stringify(kategori)); renderKategori(); renderProduk(); }
 
 // PRODUK + STOK
 function renderProduk(){
   const list = document.getElementById('listProduk'); list.innerHTML='';
+  if(produk.length === 0){ list.innerHTML = '<small style="color:#888">Belum ada produk</small>'}
   produk.forEach((p,i)=>{
     const stok = p.stok!== undefined? ` | Stok: ${p.stok}` : '';
     list.innerHTML += `<div class="list-item"><span>${p.nama} - Rp ${p.harga.toLocaleString('id-ID')}${stok}</span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
@@ -201,15 +192,17 @@ function renderProduk(){
 function tambahProduk(){
   const nama = document.getElementById('namaProduk').value;
   const harga = parseInt(document.getElementById('hargaProduk').value);
-  const stok = parseInt(document.getElementById('stokProduk').value) || 0; // AMBIL STOK
+  const stok = parseInt(document.getElementById('stokProduk').value) || 0;
   const kat = document.getElementById('kategoriProduk').value;
-  if(nama && harga >= 0){
-    produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat, stok:stok}); // SIMPAN STOK
+  if(nama && harga >= 0 && kat){
+    produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat, stok:stok});
     localStorage.setItem('produk',JSON.stringify(produk));
     document.getElementById('namaProduk').value='';
     document.getElementById('hargaProduk').value='';
     document.getElementById('stokProduk').value='';
-    renderProduk();
+    renderProduk(); // RENDER ULANG BIAR LANGSUNG MUNCUL
+  } else {
+    alert("Nama, Harga, dan Kategori wajib diisi")
   }
 }
 function hapusProduk(i){ produk.splice(i,1); localStorage.setItem('produk',JSON.stringify(produk)); renderProduk(); }
