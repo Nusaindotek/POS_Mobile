@@ -2,162 +2,88 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mesin Kasir</title>
+<title>Katalog</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14B3B5">
 <style>
-body{background:#0F2537; color:white; font-family:Arial; margin:0; padding:0 0 140px 0}
-.header{background:#14B3B5; color:#0F2537; padding:14px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between}
-.kategori-bar{display:flex; gap:8px; padding:10px 12px; overflow-x:auto; background:#1a2e3d}
-.kategori-btn{padding:6px 12px; border:1px solid #14B3B5; border-radius:20px; background:transparent; color:#14B3B5; white-space:nowrap; cursor:pointer; font-size:13px}
-.kategori-btn.active{background:#14B3B5; color:#0F2537}
-.produk-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:12px}
-.produk-card{background:#1a2e3d; padding:10px; border-radius:10px; text-align:center; border:1px solid #2a3e4d}
-.produk-card button{background:#14B3B5; color:#0F2537; border:none; padding:6px; border-radius:6px; width:100%; font-weight:bold; font-size:13px}
-.produk-card .stok{font-size:11px; color:#888; margin-top:4px} /* TAMBAHAN */
-.keranjang{position:fixed; bottom:50px; left:0; width:100%; background:#0a141c; padding:10px 12px; border-top:1px solid #2a3e4d; box-sizing:border-box}
-.keranjang-item{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin:6px 0}
-.qty-btn{background:#2a3e4d; color:white; border:none; width:24px; height:24px; border-radius:6px; font-weight:bold}
-.btn-simpan-cetak{background:#14B3B5; color:#0F2537; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:8px}
-.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#0a141c; display:flex; justify-content:space-around; padding:4px 0; border-top:1px solid #2a3e4d; height:50px}
-.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:10px; flex:1; padding-top:4px}
+body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
+.header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between}
+.card{background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.input{width:100%; padding:14px; margin:8px 0; border:1px solid #ddd; border-radius:10px; box-sizing:border-box; font-size:15px}
+.btn-simpan{background:#14B3B5; color:white; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px}
+.list-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px}
+.list-item button{background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:12px}
+.btn-bayar{background:#ff9800; color:white; width:100%; padding:16px; border-radius:10px; border:none; font-weight:bold; font-size:16px; margin-top:10px; position:fixed; bottom:70px; left:12px; width:calc(100% - 24px)}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
+.bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
 .bottom-nav a.active{color:#14B3B5}
-@media print {
-  body * { visibility: hidden; }
-  #struk, #struk * { visibility: visible; }
-  #struk { position: absolute; left: 0; top: 0; width: 58mm; font-size: 11px; font-family: monospace; color: black; background: white; padding: 2mm; text-align:center }
-}
-#struk { display: none; }
 </style>
 </head>
 <body>
-  <div class="header">Mesin Kasir <a href="dashboard.html" style="color:#0F2537; text-decoration:none">←</a></div>
-  <div class="kategori-bar" id="kategori-bar"></div>
-  <div id="produk-list" class="produk-grid"></div>
-
-  <div class="keranjang">
-    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-      <b>Keranjang</b><b id="total" style="color:#14B3B5">Rp 0</b>
-    </div>
-    <div id="list-keranjang"><small style="color:#888">Belum ada barang</small></div>
-    <button onclick="simpanDanCetak()" class="btn-simpan-cetak">SIMPAN & CETAK</button>
+  <div class="header">Kasir <span onclick="alert('Fitur cetak ada di setting')" style="cursor:pointer">🖨️</span></div>
+  <div class="card">
+    <b>Tambah Produk ke Katalog</b>
+    <input class="input" id="namaProduk" placeholder="Nama Produk">
+    <input class="input" id="hargaProduk" type="number" placeholder="Harga">
+    <input class="input" id="stokProduk" type="number" placeholder="Stok Awal">
+    <input class="input" id="kategoriProduk" placeholder="Kategori">
+    <button onclick="tambahProduk()" class="btn-simpan">SIMPAN PRODUK</button>
   </div>
-
+  <div class="card">
+    <b>Produk</b>
+    <div id="listProdukKatalog"></div>
+  </div>
+  <button class="btn-bayar" onclick="bayar()">BAYAR & CETAK</button>
   <div class="bottom-nav">
     <a href="dashboard.html"><div>🏠</div>Dashboard</a>
     <a href="catalog.html" class="active"><div>🧾</div>Kasir</a>
     <a href="report.html"><div>📊</div>Laporan</a>
     <a href="setting.html"><div>🏪</div>Info Toko</a>
   </div>
-
-  <div id="struk"></div>
-
 <script>
-let keranjang=[];
-let kategoriAktif = "Semua";
-let isConnected = false; 
-let produk=JSON.parse(localStorage.getItem('produk')) || []; // GANTI JADI LET BIAR BISA DIUPDATE
-const namaToko = localStorage.getItem('namaToko') || "NusaPOS";
-const alamatToko = localStorage.getItem('alamatToko') || "Bandung";
-const noHp = localStorage.getItem('noHp') || "";
-const footer = localStorage.getItem('footer') || "Terima Kasih"; 
+let produk = JSON.parse(localStorage.getItem('produk')) || JSON.parse(localStorage.getItem('products')) || [];
+let keranjang = [];
 
-function renderKategori(){ /* ... SAMA ... */
-  const bar = document.getElementById('kategori-bar');
-  const kategori = ["Semua", ...new Set(produk.map(p=>p.kategori))];
-  bar.innerHTML = '';
-  kategori.forEach(k=>{
-    bar.innerHTML += `<button class="kategori-btn ${kategoriAktif===k?'active':''}" onclick="filterKategori('${k}')">${k}</button>`
+window.onload = renderKatalog;
+
+function simpanProdukKeStorage(){
+  localStorage.setItem('produk',JSON.stringify(produk));
+  localStorage.setItem('products',JSON.stringify(produk));
+}
+
+function renderKatalog(){
+  const list = document.getElementById('listProdukKatalog'); list.innerHTML='';
+  produk.forEach((p,i)=>{
+    list.innerHTML += `<div class="list-item"><span onclick="tambahKeKeranjang(${i})"><b>${p.nama}</b><br><small>Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok || 0}</small></span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
   })
 }
-
-function filterKategori(k){ kategoriAktif = k; renderKategori(); renderProduk(); }
-
-function renderProduk(){
-  const list=document.getElementById('produk-list'); list.innerHTML='';
-  const data = kategoriAktif === "Semua" ? produk : produk.filter(p=>p.kategori===kategoriAktif);
-  data.forEach(p=>{
-    const stokTeks = p.stok !== undefined ? `Stok: ${p.stok}` : ''; // TAMPILIN STOK
-    list.innerHTML+=`<div class="produk-card"><b>${p.nama}</b><br><span style="color:#14B3B5">Rp ${p.harga.toLocaleString('id-ID')}</span><div class="stok">${stokTeks}</div><button onclick="tambah(${p.id})">+ Tambah</button></div>`
-  })
-}
-
-function tambah(id){
-  const item=produk.find(p=>p.id===id);
-  if(item.stok !== undefined && item.stok <= 0){ // CEK STOK DULU
-    return alert(`Stok ${item.nama} habis`);
-  }
-  const ada=keranjang.find(k=>k.id===id);
-  if(ada) ada.qty++; 
-  else keranjang.push({...item,qty:1});
-  render()
-}
-
-function kurang(id){const ada=keranjang.find(k=>k.id===id);if(ada.qty > 1) ada.qty--; else keranjang = keranjang.filter(k=>k.id!==id);render()}
-function render(){let total=0;const list=document.getElementById('list-keranjang');list.innerHTML='';if(keranjang.length===0){list.innerHTML=`<small style="color:#888">Belum ada barang</small>`}keranjang.forEach(i=>{total+=i.harga*i.qty;list.innerHTML+=`<div class="keranjang-item"><span>${i.nama}</span><div><button class="qty-btn" onclick="kurang(${i.id})">-</button><span style="margin:0 8px">${i.qty}</span><button class="qty-btn" onclick="tambah(${i.id})">+</button><span style="margin-left:10px; color:#14B3B5">Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div></div>`});document.getElementById('total').innerText=`Rp ${total.toLocaleString('id-ID')}`}
-
-function autoConnectPrinter(){ /* ... SAMA ... */ 
-  const address = localStorage.getItem('printerAddress');
-  if(typeof bluetoothSerial !== 'undefined' && address){
-    bluetoothSerial.connect(address, function(){ isConnected = true; }, function(){ isConnected = false; });
+function tambahProduk(){
+  const nama = document.getElementById('namaProduk').value;
+  const harga = parseInt(document.getElementById('hargaProduk').value);
+  const stok = parseInt(document.getElementById('stokProduk').value) || 0;
+  const kat = document.getElementById('kategoriProduk').value;
+  if(nama && harga >= 0){
+    produk.push({id:Date.now(), nama:nama, harga:harga, kategori:kat, stok:stok});
+    simpanProdukKeStorage();
+    document.getElementById('namaProduk').value=''; document.getElementById('hargaProduk').value=''; document.getElementById('stokProduk').value='';
+    renderKatalog();
   }
 }
-
-function cetakBluetooth(strukText){ /* ... SAMA ... */
-  bluetoothSerial.write("\x1B\x40"); bluetoothSerial.write("\x1D\x21\x00"); bluetoothSerial.write(strukText); bluetoothSerial.write("\n\n\x1B\x69"); 
+function hapusProduk(i){ produk.splice(i,1); simpanProdukKeStorage(); renderKatalog(); }
+function tambahKeKeranjang(i){ keranjang.push(produk[i]); alert(produk[i].nama + ' ditambahkan') }
+function bayar(){
+  if(keranjang.length === 0) return alert('Keranjang kosong');
+  let total = keranjang.reduce((sum, item) => sum + item.harga, 0);
+  let transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
+  transaksi.push({id:Date.now(), tanggal:new Date(), total:total, items:keranjang});
+  localStorage.setItem('transaksi',JSON.stringify(transaksi));
+  // KURANGI STOK
+  keranjang.forEach(item => { let p = produk.find(prod => prod.id === item.id); if(p) p.stok--; });
+  simpanProdukKeStorage();
+  keranjang = [];
+  alert('Transaksi Rp ' + total.toLocaleString('id-ID') + ' berhasil');
 }
-
-function buatFormatStruk(total, tanggal){ /* ... SAMA ... */
-  let struk = `\x1B\x61\x01`; struk += `${namaToko}\n${alamatToko}\n`; if(noHp) struk += `${noHp}\n`;
-  struk += `========================\n\x1B\x61\x00`;
-  keranjang.forEach(i=>{ let nama = i.nama.substring(0,14); let qty = i.qty + "x"; let harga = (i.harga*i.qty).toLocaleString('id-ID');
-    struk += `${nama}\n${qty.padEnd(4,' ')}${harga.padStart(20,' ')}\n`; });
-  struk += `========================\n\x1B\x61\x02TOTAL:Rp ${total.toLocaleString('id-ID')}\n\x1B\x61\x01${tanggal.toLocaleString('id-ID')}\n${footer}\n`;
-  return struk;
-}
-
-function buatFormatHTML(total, tanggal){ /* ... SAMA ... */
-  let isiStruk = `<div><b style="font-size:14px">${namaToko}</b><br><small>${alamatToko}</small><br>${noHp ? `<small>Telp: ${noHp}</small><br>` : ''}=========================<br></div>`;
-  keranjang.forEach(i=>{ isiStruk += `<div style="text-align:left">${i.nama}</div><div style="display:flex; justify-content:space-between"><span>${i.qty} x Rp ${i.harga.toLocaleString('id-ID')}</span> <span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div>` });
-  isiStruk += `=========================<br><div style="display:flex; justify-content:space-between"><b>TOTAL</b><b>Rp ${total.toLocaleString('id-ID')}</b></div><div style="margin-top:8px"><small>${tanggal.toLocaleString('id-ID')}</small><br><br><b>${footer}</b><br></div>`;
-  return isiStruk;
-}
-
-function simpanDanCetak(){
-  if(keranjang.length===0)return alert("Keranjang kosong");
-  const total=keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
-  const tanggal = new Date();
-  const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
-  riwayat.push({id:Date.now(), items:keranjang, total:total, tanggal:tanggal});
-  localStorage.setItem('riwayat',JSON.stringify(riwayat));
-  localStorage.setItem('lastTransaksi',JSON.stringify({total:total}));
-
-  // LOGIKA BARU: KURANGI STOK
-  keranjang.forEach(itemJual => {
-    const indexProduk = produk.findIndex(p => p.id === itemJual.id);
-    if(indexProduk !== -1 && produk[indexProduk].stok !== undefined){
-      produk[indexProduk].stok -= itemJual.qty; // KURANGI
-      if(produk[indexProduk].stok < 0) produk[indexProduk].stok = 0; // JANGAN MINUS
-    }
-  });
-  localStorage.setItem('produk', JSON.stringify(produk)); // SIMPAN LAGI KE LOCALSTORAGE
-
-  if(typeof bluetoothSerial !== 'undefined' && isConnected){
-    let strukBT = buatFormatStruk(total, tanggal);
-    cetakBluetooth(strukBT);
-  } else {
-    if(typeof bluetoothSerial !== 'undefined' && !isConnected && localStorage.getItem('printerAddress')){
-      alert("Printer belum terhubung. Silahkan pilih printer di menu Info Toko dulu");
-      return;
-    }
-    document.getElementById('struk').innerHTML = buatFormatHTML(total, tanggal);
-    window.print();
-  }
-
-  keranjang=[]; renderProduk(); render(); // RENDER ULANG BIAR STOK UPDATE
-  alert(`Transaksi Berhasil!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
-}
-
-renderKategori(); renderProduk(); 
-autoConnectPrinter();
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
 </html>
