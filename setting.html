@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Info Toko</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14B3B5">
 <style>
 body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80px 0}
 .header{background:#14B3B5; color:white; padding:16px; font-weight:bold; font-size:18px; display:flex; justify-content:space-between; align-items:center}
@@ -17,15 +19,13 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
 .btn-printer{width:100%; padding:14px; background:#F5F7FA; color:#14B3B5; border:2px dashed #14B3B5; border-radius:10px; font-size:15px; font-weight:bold; margin-top:8px}
 .list-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px}
 .list-item button{background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:12px}
-.kontak-wa{display:flex; align-items:center; gap:12px; background:#E8F8F9; padding:16px; border-radius:12px; text-decoration:none; color:#333}
 .bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:white; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd}
 .bottom-nav a{color:#888; text-decoration:none; text-align:center; font-size:11px; flex:1}
 .bottom-nav a.active{color:#14B3B5}
 </style>
 </head>
 <body>
-  <div class="header">Info Toko <div><a href="#" style="color:white">⚙️</a> <a href="#" style="color:white">📁</a></div></div>
-
+  <div class="header">Info Toko</div>
   <div class="card">
     <div class="toko-header">
       <div class="toko-logo"><img id="logo-preview" src="https://via.placeholder.com/70/F5F7FA/888?text=🏪"></div>
@@ -37,7 +37,6 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
       </div>
     </div>
   </div>
-
   <div class="card">
     <b>Pengaturan Informasi Toko</b><br><br>
     <input class="input" id="namaToko" placeholder="🏪 Nama Toko">
@@ -45,49 +44,35 @@ body{background:#F5F7FA; color:#333; font-family:Arial; margin:0; padding:0 0 80
     <input class="input" id="noHp" placeholder="📞 Nomor HP">
     <select class="input" id="ukuranKertas"><option>58 mm</option><option>80 mm</option></select>
     <b>Pengaturan Printer</b>
-    <button class="btn-printer" onclick="pilihPrinter()">🔵 Pilih Printer Bluetooth</button>
+    <button class="btn-printer" onclick="alert('Printer hanya jalan di APK')">🔵 Pilih Printer Bluetooth</button>
     <small id="status-printer" style="color:#888; display:block; margin-top:6px">Belum ada printer dipilih</small>
     <input class="input" id="footer" placeholder="📝 Footer Struk (opsional)">
     <button class="btn-simpan" onclick="simpanInfo()">Simpan Info Toko</button>
   </div>
-
-  <!-- KELOLA KATEGORI UDAH DIHAPUS DARI SINI -->
-
-  <!-- CARD: RESTOCK PRODUK DARI KATALOG -->
   <div class="card">
     <b>Restock Produk</b>
     <small style="color:#888">Pilih produk dari katalog untuk menambah stok</small>
     <select class="input" id="pilihProdukRestock" style="margin-top:8px"></select>
     <input class="input" id="tambahStok" type="number" placeholder="Jumlah Stok yang Ditambahkan">
     <button onclick="restockProduk()" class="btn-simpan" style="background:#ff9800">TAMBAH STOK</button>
-
     <b style="display:block; margin-top:16px">Daftar Produk di Katalog</b>
     <div id="listProduk" style="margin-top:10px"></div>
   </div>
-
   <div class="card">
     <b>Backup & Restore</b>
     <button onclick="backupData()" class="btn-abu">EXPORT DATA</button>
     <input type="file" id="fileRestore" onchange="restoreData(event)" style="display:none">
     <button onclick="document.getElementById('fileRestore').click()" class="btn-abu">IMPORT DATA</button>
   </div>
-
-  <div class="card">
-    <a href="https://wa.me/6281234567890" target="_blank" class="kontak-wa">
-      <div style="font-size:35px">💬</div><div><b>Butuh Bantuan?</b><br><small>Hubungi Admin via WhatsApp</small></div>
-    </a>
-  </div>
-
   <div class="bottom-nav">
     <a href="dashboard.html"><div>🏠</div>Dashboard</a>
     <a href="catalog.html"><div>🧾</div>Kasir</a>
     <a href="report.html"><div>📊</div>Laporan</a>
     <a href="setting.html" class="active"><div>🏪</div>Info Toko</a>
   </div>
-
 <script>
-let produk = JSON.parse(localStorage.getItem('produk')) || [];
-let kategori = JSON.parse(localStorage.getItem('kategori')) || []; // TETAP LOAD BIAR DROPDOWN RESTOCK BISA
+let produk = JSON.parse(localStorage.getItem('produk')) || JSON.parse(localStorage.getItem('products')) || [];
+let kategori = JSON.parse(localStorage.getItem('kategori')) || [];
 
 window.onload = function(){
   document.getElementById('namaToko').value = localStorage.getItem('namaToko') || '';
@@ -98,14 +83,11 @@ window.onload = function(){
   document.getElementById('logo-preview').src = localStorage.getItem('logoToko') || 'https://via.placeholder.com/70/F5F7FA/888?text=🏪';
   document.getElementById('nama-toko-view').innerText = localStorage.getItem('namaToko') || 'Nama Toko belum diatur';
   document.getElementById('alamat-view').innerText = localStorage.getItem('alamatToko') || 'Alamat belum diatur';
-  const nama = localStorage.getItem('printerName');
-  if(nama){ document.getElementById('status-printer').innerText = `Terhubung ke ${nama}`; }
-  renderProduk(); // LANGSUNG TAMPILIN PRODUK
+  renderProduk();
 }
 
 document.getElementById('uploadLogo').addEventListener('change', function(e){
-  const file = e.target.files[0];
-  const reader = new FileReader();
+  const file = e.target.files[0]; const reader = new FileReader();
   reader.onload = function(event){
     document.getElementById('logo-preview').src = event.target.result;
     localStorage.setItem('logoToko', event.target.result);
@@ -124,43 +106,19 @@ function simpanInfo(){
   alert('Info Toko Tersimpan!');
 }
 
-function pilihPrinter(){
-  if(typeof bluetoothSerial === 'undefined'){ alert("Fitur ini hanya jalan di APK Android"); return; }
-  bluetoothSerial.list(
-    function(devices){
-      if(devices.length === 0) return alert("Tidak ada printer bluetooth ditemukan");
-      let list = "Pilih Printer:\n";
-      devices.forEach((d,i)=> list += `${i+1}. ${d.name}\n`);
-      let pilih = prompt(list + "\nKetik nomor printer:");
-      if(pilih){
-        let device = devices[pilih-1];
-        bluetoothSerial.connect(device.address,
-          function(){
-            localStorage.setItem('printerAddress', device.address);
-            localStorage.setItem('printerName', device.name);
-            document.getElementById('status-printer').innerText = `Terhubung ke ${device.name}`;
-            alert("Printer berhasil disimpan");
-          },
-          function(){ alert("Gagal konek ke " + device.name) }
-        );
-      }
-    },
-    function(){ alert("Bluetooth mati") }
-  );
+function simpanProdukKeStorage(){
+  localStorage.setItem('produk',JSON.stringify(produk));
+  localStorage.setItem('products',JSON.stringify(produk));
 }
 
-// PRODUK + RESTOCK DARI KATALOG
 function renderProduk(){
   const list = document.getElementById('listProduk');
   const selectRestock = document.getElementById('pilihProdukRestock');
   list.innerHTML=''; selectRestock.innerHTML='';
-
   if(produk.length === 0){
-    list.innerHTML = '<small style="color:#888">Belum ada produk di katalog. Tambah dulu di halaman Katalog</small>';
-    selectRestock.innerHTML = '<option>Belum ada produk</option>';
-    return;
+    list.innerHTML = '<small style="color:#888">Belum ada produk di katalog. Tambah dulu di halaman Kasir</small>';
+    selectRestock.innerHTML = '<option>Belum ada produk</option>'; return;
   }
-
   produk.forEach((p,i)=>{
     const stok = p.stok!== undefined? `Stok: ${p.stok}` : 'Stok: 0';
     list.innerHTML += `<div class="list-item"><span><b>${p.nama}</b><br><small>Rp ${p.harga.toLocaleString('id-ID')} | ${p.kategori} | ${stok}</small></span><button onclick="hapusProduk(${i})">Hapus</button></div>`;
@@ -170,53 +128,39 @@ function renderProduk(){
 
 function hapusProduk(i){
   if(confirm(`Hapus produk ${produk[i].nama}?`)){
-    produk.splice(i,1);
-    localStorage.setItem('produk',JSON.stringify(produk));
-    renderProduk();
+    produk.splice(i,1); simpanProdukKeStorage(); renderProduk();
   }
 }
 
-// FUNGSI RESTOCK
 function restockProduk(){
   const idProduk = parseInt(document.getElementById('pilihProdukRestock').value);
   const jumlahTambah = parseInt(document.getElementById('tambahStok').value);
-
-  if(!idProduk ||!jumlahTambah || jumlahTambah <= 0){
-    return alert("Pilih produk dan isi jumlah stok yang benar");
-  }
-
+  if(!idProduk ||!jumlahTambah || jumlahTambah <= 0){ return alert("Pilih produk dan isi jumlah stok yang benar"); }
   const indexProduk = produk.findIndex(p => p.id === idProduk);
   if(indexProduk!== -1){
-    produk[indexProduk].stok += jumlahTambah;
-    localStorage.setItem('produk',JSON.stringify(produk));
-    document.getElementById('tambahStok').value='';
-    renderProduk();
+    produk[indexProduk].stok += jumlahTambah; simpanProdukKeStorage(); document.getElementById('tambahStok').value=''; renderProduk();
     alert(`Stok ${produk[indexProduk].nama} berhasil ditambah ${jumlahTambah}`);
   }
 }
 
-// BACKUP RESTORE
 function backupData(){
   const data = {produk:produk, kategori:kategori, namaToko:localStorage.getItem('namaToko'), alamatToko:localStorage.getItem('alamatToko'), noHp:localStorage.getItem('noHp'), footer:localStorage.getItem('footer'), ukuranKertas:localStorage.getItem('ukuranKertas')};
   const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='backup-nusapos.json'; a.click();
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='backup-nusapos.json'; a.click();
 }
 function restoreData(e){
   const file = e.target.files[0]; const reader = new FileReader();
   reader.onload = function(event){
     const data = JSON.parse(event.target.result);
-    localStorage.setItem('produk',JSON.stringify(data.produk));
-    localStorage.setItem('kategori',JSON.stringify(data.kategori));
-    localStorage.setItem('namaToko',data.namaToko);
-    localStorage.setItem('alamatToko',data.alamatToko);
-    localStorage.setItem('noHp',data.noHp);
-    localStorage.setItem('footer',data.footer);
-    localStorage.setItem('ukuranKertas',data.ukuranKertas);
+    localStorage.setItem('produk',JSON.stringify(data.produk)); localStorage.setItem('products',JSON.stringify(data.produk));
+    localStorage.setItem('kategori',JSON.stringify(data.kategori)); localStorage.setItem('namaToko',data.namaToko);
+    localStorage.setItem('alamatToko',data.alamatToko); localStorage.setItem('noHp',data.noHp);
+    localStorage.setItem('footer',data.footer); localStorage.setItem('ukuranKertas',data.ukuranKertas);
     location.reload();
   }
   reader.readAsText(file);
 }
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
 </html>
